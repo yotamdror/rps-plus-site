@@ -30,12 +30,6 @@
     background-color: var(--ink);
   }
 
-  /* the game's sky: a few square stars, one twinkling a step on a slow clock */
-  .sky i { position: absolute; width: 2px; height: 2px; background: var(--slate); }
-  .sky i.t { animation: twinkle 6s steps(1, end) infinite; }
-  .sky i.t:nth-child(5) { animation-duration: 7.5s; animation-delay: -3s; }
-  @keyframes twinkle { 0%, 88% { background: var(--slate); } 89%, 96% { background: var(--grey); } }
-
   /* lit plastic letters: a bright top, a dark lower lip, a glow on the wall */
   h1 {
     margin: 0;
@@ -66,7 +60,7 @@
     50%, 100% { opacity: 1; }
   }
   @media (prefers-reduced-motion: reduce) {
-    h1 span, .sky i.t { animation: none; }
+    h1 span { animation: none; }
   }
 
   .line {
@@ -124,13 +118,6 @@
 </style>
 </head>
 <body>
-  <div class="sky" aria-hidden="true">
-    <i style="left:11%;top:14%"></i><i class="t" style="left:83%;top:9%"></i>
-    <i style="left:64%;top:27%"></i><i style="left:22%;top:79%"></i>
-    <i class="t" style="left:89%;top:68%"></i><i style="left:6%;top:46%"></i>
-    <i style="left:47%;top:92%"></i>
-  </div>
-
   <h1 aria-label="RPS+"><span class="r" data-l="R">R</span><span class="p" data-l="P">P</span><span class="s" data-l="S">S</span><span class="plus" data-l="+">+</span></h1>
   <p class="line"><span>Alpha coming ·</span> <span>January 2027</span></p>
 
