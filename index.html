@@ -111,6 +111,16 @@
     font: 13px "Pixelify Sans", system-ui, sans-serif; color: var(--warm-grey);
     max-width: 300px; text-align: center; line-height: 1.3;
   }
+  .notify small.warn { color: var(--cream); }
+  .notify .send:disabled { opacity: 0.55; cursor: default; }
+  /* sent: the field gives way to one brass word, the promise stays under it */
+  .notify .noted {
+    display: none; padding: 9px 0 10px;
+    font-family: "Silkscreen", ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.14em; color: var(--brass-light);
+  }
+  .notify.sent .row { display: none; }
+  .notify.sent .noted { display: block; }
 </style>
 </head>
 <body>
@@ -131,7 +141,8 @@
         <input type="email" name="email" placeholder="you@email" autocomplete="email" aria-label="Email" required>
         <button class="send" type="submit">SEND</button>
       </div>
-      <small>One email when the alpha opens. Nothing else.</small>
+      <p class="noted">NOTED ▸</p>
+      <small role="status">One email when the alpha opens. Nothing else.</small>
     </form>
   </div>
 
@@ -141,8 +152,36 @@
       box.classList.add('open');
       box.querySelector('input').focus();
     });
-    // MOCK: not wired. The real form posts to the alpha-notify endpoint once it exists.
-    box.querySelector('form').addEventListener('submit', e => e.preventDefault());
+    // Sign-ups go to the RPS+ Alpha Worker's notify table (rps-plus repo, site-signup):
+    // stored only there, read only by us, never shown back.
+    const API = 'https://rps-plus-alpha-staging.rps-plus.workers.dev/api/notify';
+    const PROMISE = 'One email when the alpha opens. Nothing else.';
+    const form = box.querySelector('form'), input = form.querySelector('input');
+    const send = form.querySelector('.send'), note = form.querySelector('small');
+    const say = (text, warn) => { note.textContent = text; note.classList.toggle('warn', !!warn); };
+    input.addEventListener('input', () => { if (note.classList.contains('warn')) say(PROMISE); });
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (send.disabled) return;
+      const email = input.value.trim();
+      if (!/^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(email) || email.length > 254) {
+        say("That doesn't look like an email.", true); input.focus(); return;
+      }
+      send.disabled = true;
+      try {
+        const res = await fetch(API, {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ email, source: 'site' }), signal: AbortSignal.timeout(10000)
+        });
+        if (res.status === 400) { say("That doesn't look like an email.", true); input.focus(); return; }
+        if (!res.ok) throw new Error(res.status);
+        box.classList.add('sent'); say(PROMISE); input.value = '';
+      } catch {
+        say("Didn't go through. Try again.", true);
+      } finally {
+        send.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>
