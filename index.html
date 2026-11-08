@@ -63,7 +63,7 @@
   .notify small.warn { color: var(--cream); }
   .notify small:empty { display: none; }
   .notify .send:disabled { opacity: 0.35; cursor: default; }
-  /* sent: the field gives way to one brass word, the promise stays under it */
+  /* sent: the field gives way to a brass line, the promise stays under it */
   .notify .noted {
     display: none; padding: 9px 0 10px;
     font-family: "Silkscreen", ui-monospace, monospace;
@@ -94,6 +94,10 @@
   .below .notify.open form { padding: 8px 2px 8px; }
   .below .notify input { width: min(44vw, 150px); }
   .below .notify small { max-width: 200px; }
+  /* sent: the chip becomes a box the Replay button's size (160 x 44) */
+  .below .chip:has(.notify.sent) { padding: 0; width: 160px; height: 44px; box-sizing: border-box; justify-content: center; }
+  .below .notify.sent form { padding: 0; gap: 0; }
+  .below .notify.sent .noted { padding: 0; margin: 0; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -106,7 +110,7 @@
         <input type="email" name="email" placeholder="you@email" autocomplete="email" aria-label="Email" required>
         <button class="send" type="submit">SEND</button>
       </div>
-      <p class="noted">NOTED ▸</p>
+      <p class="noted">YOU'RE IN</p>
       <small role="status"></small>
     </form>
   </div>
