@@ -18,58 +18,14 @@
     /* master-palette tokens (rps-plus assets/palette.json) */
     --ink: #070708; --charcoal: #2B2824; --slate: #48433C; --warm-grey: #817965;
     --grey: #9E9687; --cream: #F3E5C4; --brass-light: #C0B48E;
-    /* the three signals: the wordmark and nothing else */
-    --rock: #FF2E6E; --paper: #2EE6FF; --scis: #FFCE3A;
   }
   html, body { margin: 0; }
   body {
     min-height: 100vh; min-height: 100dvh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 16px; box-sizing: border-box; position: relative; overflow-x: hidden;
-    background: radial-gradient(ellipse 80% 60% at 50% 45%, #141311 0%, var(--ink) 70%);
-    background-color: var(--ink);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: 0; box-sizing: border-box; position: relative; overflow-x: hidden;
+    background: var(--ink);
   }
-
-  /* lit plastic letters: a bright top, a dark lower lip, a glow on the wall */
-  h1 {
-    margin: 0;
-    font-family: "Jersey 25", ui-monospace, monospace; font-weight: 400;
-    font-size: clamp(96px, 32vw, 168px); line-height: 0.9; letter-spacing: 0.02em;
-  }
-  h1 span { display: inline-block; position: relative; }
-  h1 span::before {
-    content: attr(data-l); position: absolute; inset: 0;
-    background: linear-gradient(180deg, #ffffff59 0%, #ffffff00 40%, #00000000 72%, #00000033 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    text-shadow: none;
-  }
-  .r { color: var(--rock);  text-shadow: 0 2px 0 #7a1636, 0 0 28px #FF2E6E66; }
-  .p { color: var(--paper); text-shadow: 0 2px 0 #12707c, 0 0 28px #2EE6FF66; }
-  .s { color: var(--scis);  text-shadow: 0 2px 0 #7f631a, 0 0 28px #FFCE3A66; }
-  .plus { color: var(--cream); text-shadow: 0 2px 0 #6b6150, 0 0 22px #F3E5C433; }
-
-  /* the lamps come on one by one, like ROCK, PAPER, SCISSORS in the film.
-     steps() keeps every change on whole frames, well under 30 a second */
-  h1 span { animation: lamp 0.6s steps(1, end) both; }
-  .r { animation-delay: 0.3s; } .p { animation-delay: 0.7s; }
-  .s { animation-delay: 1.1s; } .plus { animation-delay: 1.6s; }
-  @keyframes lamp {
-    0%   { opacity: 0.12; }
-    20%  { opacity: 1; }
-    35%  { opacity: 0.12; }
-    50%, 100% { opacity: 1; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    h1 span { animation: none; }
-  }
-
-  .line {
-    margin: 28px 0 0;
-    font-family: "Silkscreen", ui-monospace, monospace;
-    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--brass-light); text-align: center; /* the same brass as TELL ME WHEN */
-  }
-  .line span { white-space: nowrap; }
 
   /* the tiny sign-up */
   .notify { margin-top: 44px; min-height: 96px; display: flex; flex-direction: column; align-items: center; }
@@ -115,14 +71,36 @@
   }
   .notify.sent .row { display: none; }
   .notify.sent .noted { display: block; }
+
+  /* the opener film (opener/, built in rps-plus by scripts/marketing/build-opener.mjs), cropped 76 px top and
+     bottom (only sky and crowd there) to 393 x 700 and fitted to the screen on every device */
+  #opener { width: min(100%, calc((100svh - 64px) * 393 / 700)); }
+  #opener .box { aspect-ratio: 393 / 700 !important; }
+  #opener .stage { top: calc(var(--s) * -76px) !important; }
+  #opener .replay {
+    background: transparent; border-color: var(--slate); border-radius: 0; color: var(--brass-light);
+    font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase;
+  }
+  /* the sign-up sits on the film's lower edge in a dark box (moved into the film's .box after mount) */
+  .below { display: flex; flex-direction: column; align-items: center; padding: 8px 16px 48px; }
+  #opener .box .below { position: absolute; left: 0; right: 0; bottom: 6px; z-index: 5; padding: 0; pointer-events: none; }
+  #opener .box .below > * { pointer-events: auto; }
+  .below .chip {
+    display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 2px 6px 0;
+    background: rgba(7,7,8,.84); border: 1px solid var(--slate);
+  }
+  .below .notify { margin: 0; min-height: 0; }
+  .below .notify button.ask { padding: 12px 12px; }
+  .below .notify.open form { padding: 8px 2px 8px; }
+  .below .notify input { width: min(44vw, 150px); }
+  .below .notify small { max-width: 200px; }
 </style>
 </head>
 <body>
-  <h1 aria-label="RPS+"><span class="r" data-l="R">R</span><span class="p" data-l="P">P</span><span class="s" data-l="S">S</span><span class="plus" data-l="+">+</span></h1>
-  <p class="line"><span>Alpha coming ·</span> <span>January 2027</span></p>
-
+  <div id="opener"></div>
+  <div class="below"><div class="chip">
   <div class="notify" id="notify">
-    <button class="ask" type="button" aria-expanded="false" aria-controls="notify-form">Tell me when ▸</button>
+    <button class="ask" type="button" aria-expanded="false" aria-controls="notify-form">Send me updates ▸</button>
     <form id="notify-form" novalidate>
       <div class="row">
         <input type="email" name="email" placeholder="you@email" autocomplete="email" aria-label="Email" required>
@@ -133,6 +111,7 @@
     </form>
   </div>
 
+  </div></div>
   <script>
     const box = document.getElementById('notify');
     box.querySelector('.ask').addEventListener('click', () => {
@@ -168,6 +147,13 @@
         send.disabled = false;
       }
     });
+  </script>
+  <script src="opener/opener-player.js"></script>
+  <script>
+    // ?autoplay=0 holds the film still (for screenshots)
+    window.film = RPSOpener.mount(document.getElementById('opener'),
+      { base: 'opener/', autoplay: !/[?&]autoplay=0/.test(location.search) });
+    document.querySelector('#opener .box').appendChild(document.querySelector('.below'));
   </script>
 </body>
 </html>

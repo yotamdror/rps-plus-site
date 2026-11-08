@@ -8,3 +8,6 @@ pushes the finished files here. Do not copy game source into this repository.
 
 - `CNAME` sets the custom domain (`rps.plus`; `www.rps.plus` redirects to it).
 - `.nojekyll` serves files as they are, with no Jekyll build.
+- `opener/` is the opener film, copied as built from `rps-plus`
+  (`node scripts/marketing/build-opener.mjs`, then all of `dist/marketing/opener/` except its
+  `index.html`). A change to the film repeats that copy.

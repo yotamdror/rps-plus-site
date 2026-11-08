@@ -1,0 +1,395 @@
+{
+ "about": "The opener film's baked art (docs/plans/2026-11-06-opener-plan.md step 2; written by scripts/marketing/build-opener.mjs). Film: docs/work/mocks/opener/round16.src.html.",
+ "world": {
+  "w": 197,
+  "h": 426,
+  "px": 2,
+  "pan": 420,
+  "skyH": 846,
+  "horizon": 627,
+  "note": "camera row cam = round(pan * ease((t - pan0) / (pan1 - pan0))); the horizon is at world row horizon - cam"
+ },
+ "stage": {
+  "w": 393,
+  "h": 852
+ },
+ "timeline": {
+  "stars": 0.6,
+  "starsIn": 1.2,
+  "pan0": 2.4,
+  "pan1": 7.6,
+  "line": 7.8,
+  "lineIn": 0.6,
+  "lineOut": 11.6,
+  "lineOutIn": 2,
+  "pit": 11.6,
+  "pitIn": 2,
+  "words": [
+   14.6,
+   15.85,
+   17.1
+  ],
+  "dark": 18.35,
+  "plus": 19.75,
+  "plusIn": 0.5,
+  "end": 24.25,
+  "rules": 20.85,
+  "url": 20.85,
+  "alpha": 20.85,
+  "endFades": {
+   "rules": 0.5,
+   "url": 0.5,
+   "alpha": 0.5
+  }
+ },
+ "sky": {
+  "file": "sky.png",
+  "w": 197,
+  "h": 846,
+  "draw": "at (0, -cam) under the twinkle, faded in from stars over starsIn"
+ },
+ "skyline": {
+  "file": "skyline.png",
+  "w": 197,
+  "h": 140,
+  "horizonRow": 100,
+  "draw": "at (0, horizon - cam - horizonRow), over the disc"
+ },
+ "disc": {
+  "planet": "mars",
+  "R": 104,
+  "x": 98,
+  "turnS": 130,
+  "half": 106,
+  "S": 213,
+  "surface": {
+   "file": "mars-surface.png",
+   "w": 1024,
+   "h": 209,
+   "colours": [
+    "#E8DCC0",
+    "#8A3B2A",
+    "#B06E5C"
+   ],
+   "note": "row r = latitude v = (r - R) / R; column j = longitude u = j / w * 2 pi"
+  },
+  "light": [
+   -0.55,
+   -0.55,
+   0.63
+  ],
+  "fill": 0.42,
+  "qSteps": 5,
+  "qTop": 0.92,
+  "note": "for every dx, dy with dx*dx + dy*dy <= R*R: nx = dx / R, ny = dy / R, nz = sqrt(max(0, 1 - nx*nx - ny*ny)); lam = max(0, nx*light[0] + ny*light[1] + nz*light[2]) * .9 + .08; k = round(lam * qSteps); u = atan2(nx, nz) (plus 2 pi when negative); a = round(((t / turnS) % 1) * w); colour = surface[dy + R][(floor(u / (2 pi) * w) + a) % w]; pixel = shade[colour][k]; drawn centred on (x, horizon - cam), clipped to the rows above the horizon (makeBake disk, round 16 spinCanvas)",
+  "shade": {
+   "#E8DCC0": [
+    "#6E675C",
+    "#817965",
+    "#9E9687",
+    "#9E9687",
+    "#C0B48E",
+    "#E8DCC0"
+   ],
+   "#8A3B2A": [
+    "#2B2824",
+    "#2B2824",
+    "#2B2824",
+    "#6B4E31",
+    "#8A3B2A",
+    "#8A3B2A"
+   ],
+   "#B06E5C": [
+    "#48433C",
+    "#6B4E31",
+    "#6B4E31",
+    "#7A6335",
+    "#A5606B",
+    "#B06E5C"
+   ]
+  }
+ },
+ "crowd": {
+  "file": "29d-parade-crowd.js",
+  "lib": "parade-lib.js",
+  "init": {
+   "W": 197,
+   "HH": 426,
+   "OX": 18,
+   "OY": 0,
+   "colours": {
+    "suit": "teal-ground",
+    "suitEdge": "ink",
+    "shirt": "iron",
+    "dk": "charcoal",
+    "head": "slate",
+    "headHi": "iron",
+    "headSh": "charcoal",
+    "ink": "ink",
+    "armEdge": "dusk",
+    "hand": "slate",
+    "rust": "rust",
+    "slate": "slate",
+    "iron": "iron",
+    "grey": "grey"
+   },
+   "note": "colours are token names; pack them with parade-lib.js (pack(...hexRgb(PAL[name]))); mulberry from parade-lib.js"
+  },
+  "draw": {
+   "yh": "horizon - cam",
+   "k": 3.1285714285714286,
+   "ox": 0,
+   "fast": true,
+   "note": "k = (h - (horizon - pan)) / paradeCrowd.ROAD_D"
+  }
+ },
+ "pit": {
+  "mk": 5,
+  "mx": -4,
+  "my": 150,
+  "smokeUp": 60,
+  "chimney": [
+   37,
+   14
+  ],
+  "sprites": {
+   "mars-idle-2": {
+    "file": "sprites/mars-idle-2-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-idle-3": {
+    "file": "sprites/mars-idle-3-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-idle-4": {
+    "file": "sprites/mars-idle-4-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-idle": {
+    "file": "sprites/mars-idle-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-lit-paper": {
+    "file": "sprites/mars-lit-paper.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-lit-rock": {
+    "file": "sprites/mars-lit-rock.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-lit-scis": {
+    "file": "sprites/mars-lit-scis.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-nervous-2": {
+    "file": "sprites/mars-nervous-2-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-nervous-3": {
+    "file": "sprites/mars-nervous-3-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-nervous-4": {
+    "file": "sprites/mars-nervous-4-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-nervous": {
+    "file": "sprites/mars-nervous-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-scared-2": {
+    "file": "sprites/mars-scared-2-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-scared-3": {
+    "file": "sprites/mars-scared-3-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-scared-4": {
+    "file": "sprites/mars-scared-4-nosmoke.png",
+    "w": 80,
+    "h": 53
+   },
+   "mars-scared": {
+    "file": "sprites/mars-scared-nosmoke.png",
+    "w": 80,
+    "h": 53
+   }
+  }
+ },
+ "fonts": {
+  "Jersey 25": "fonts/Jersey25-400.woff2",
+  "Silkscreen": "fonts/Silkscreen-400.woff2",
+  "Pixelify Sans": "fonts/PixelifySans-400_700.woff2"
+ },
+ "palette": {
+  "ink": "#070708",
+  "slate": "#48433C",
+  "iron": "#6E675C",
+  "grey": "#9E9687",
+  "phosphor": "#FFFFFF",
+  "cream": "#F3E5C4",
+  "ivory": "#E8DCC0",
+  "warm-grey": "#817965",
+  "quicksilver": "#8F9AA6",
+  "faded-rose": "#A5606B",
+  "bottle": "#2E4A3B",
+  "rust": "#8A3B2A",
+  "tobacco": "#6B4E31",
+  "mint-grey": "#7FA39A",
+  "charcoal": "#2B2824",
+  "earth-ink": "#6F9A84",
+  "mars-ink": "#B06E5C",
+  "jupiter-ink": "#B08A5E",
+  "neptune-ink": "#6A86B0",
+  "money-gold": "#C8A24A",
+  "money-bright": "#FFE38A",
+  "home-world-lilac": "#B9A6FF",
+  "brass-light": "#C0B48E",
+  "brass-dark": "#7A6335",
+  "teal-ground": "#10191B",
+  "dusty-blue": "#4E7286",
+  "sage": "#5A6E5E",
+  "night": "#16233A",
+  "dusk": "#2E3340"
+ },
+ "files": {
+  "29d-parade-crowd.js": {
+   "bytes": 23871,
+   "what": "the parade's crowd (window.paradeCrowd), unchanged",
+   "from": "src/js/29d-parade-crowd.js"
+  },
+  "fonts/Jersey25-400.woff2": {
+   "bytes": 6372,
+   "what": "Jersey 25: the line, the throw words, plus, the rules line, the address",
+   "from": "assets/fonts/Jersey25-400.woff2"
+  },
+  "fonts/PixelifySans-400_700.woff2": {
+   "bytes": 12008,
+   "what": "Pixelify Sans: the speech bubble (the game's face)",
+   "from": "assets/fonts/PixelifySans-400_700.woff2"
+  },
+  "fonts/Silkscreen-400.woff2": {
+   "bytes": 3528,
+   "what": "Silkscreen: the alpha line and the speaker's TAP FOR SOUND",
+   "from": "assets/fonts/Silkscreen-400.woff2"
+  },
+  "index.html": {
+   "bytes": 1272,
+   "what": "test page: the film alone, with a paragraph under it to show it is in the flow"
+  },
+  "mars-surface.png": {
+   "bytes": 3492,
+   "what": "SURF.mars before light, 1,024 longitudes x 209 rows"
+  },
+  "opener-player.js": {
+   "bytes": 35362,
+   "what": "the film's player (RPSOpener.mount)",
+   "from": "scripts/marketing/opener-player.js"
+  },
+  "parade-lib.js": {
+   "bytes": 915,
+   "what": "the game's hexRgb, pack, mulberry, hash3"
+  },
+  "sky.png": {
+   "bytes": 3083,
+   "what": "the stars and the band (round 16 SKY)"
+  },
+  "skyline.png": {
+   "bytes": 706,
+   "what": "paintStatic skyline, trees, land (round 16 PARADE_BG)"
+  },
+  "sound.js": {
+   "bytes": 112601,
+   "what": "the game's sound code (knobs, AU, FAIR, one patch) and the film's score; loaded after the first frame"
+  },
+  "sprites/mars-idle-2-nosmoke.png": {
+   "bytes": 557,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-idle-2-nosmoke.png"
+  },
+  "sprites/mars-idle-3-nosmoke.png": {
+   "bytes": 544,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-idle-3-nosmoke.png"
+  },
+  "sprites/mars-idle-4-nosmoke.png": {
+   "bytes": 557,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-idle-4-nosmoke.png"
+  },
+  "sprites/mars-idle-nosmoke.png": {
+   "bytes": 557,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-idle-nosmoke.png"
+  },
+  "sprites/mars-lit-paper.png": {
+   "bytes": 141,
+   "what": "Mars's chest light",
+   "from": "assets/sprites/simple/mars/mars-lit-paper.png"
+  },
+  "sprites/mars-lit-rock.png": {
+   "bytes": 140,
+   "what": "Mars's chest light",
+   "from": "assets/sprites/simple/mars/mars-lit-rock.png"
+  },
+  "sprites/mars-lit-scis.png": {
+   "bytes": 140,
+   "what": "Mars's chest light",
+   "from": "assets/sprites/simple/mars/mars-lit-scis.png"
+  },
+  "sprites/mars-nervous-2-nosmoke.png": {
+   "bytes": 552,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-nervous-2-nosmoke.png"
+  },
+  "sprites/mars-nervous-3-nosmoke.png": {
+   "bytes": 552,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-nervous-3-nosmoke.png"
+  },
+  "sprites/mars-nervous-4-nosmoke.png": {
+   "bytes": 552,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-nervous-4-nosmoke.png"
+  },
+  "sprites/mars-nervous-nosmoke.png": {
+   "bytes": 552,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-nervous-nosmoke.png"
+  },
+  "sprites/mars-scared-2-nosmoke.png": {
+   "bytes": 553,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-scared-2-nosmoke.png"
+  },
+  "sprites/mars-scared-3-nosmoke.png": {
+   "bytes": 553,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-scared-3-nosmoke.png"
+  },
+  "sprites/mars-scared-4-nosmoke.png": {
+   "bytes": 553,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-scared-4-nosmoke.png"
+  },
+  "sprites/mars-scared-nosmoke.png": {
+   "bytes": 553,
+   "what": "Mars without his smoke (step 1)",
+   "from": "assets/sprites/simple/mars/mars-scared-nosmoke.png"
+  }
+ }
+}
