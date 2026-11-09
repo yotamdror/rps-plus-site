@@ -21,7 +21,7 @@
 
    RPSOpener.mount(el, { base: './', autoplay: true, paradeStart }) -> { ready, soundReady, sound(on), replay(), seek(t), stats, duration }
      base        the folder the baked files are in (the page's URL resolves it)
-     mix         the opening's four tuners, read at each play (opener-score.js MIX): { crowd, crowdPeak, musicLow, musicFull }
+     mix         overrides for the opening's levels and times, read at each play (opener-score.js MIX): { crowd, musicIn, musicLow, musicFull }
      paradeStart the parade's loop starts at this float (0 to 11, manifest.parade.order) on every play; left out, each play
                  (the first, replay(), sound(true)) picks one at random. The checks and the test page's ?parade=<n> fix it
      ready       a promise: files loaded and the first frame drawn
@@ -167,6 +167,7 @@ function mount(host, opts){
 
     const PR = man.parade, floatImgs = {};   // the parade's floats (docs/plans/2026-11-09-opener-parade-plan.md)
     await Promise.all(PR.order.map(async k => { floatImgs[k] = await loadImage(baseDir + PR.floats[k].file); }));
+    const groundImg = PR.ground ? await loadImage(baseDir + PR.ground.file) : null;
     const [skyImg, skylineImg, surfImg, lib, paradeCrowd] = await Promise.all([
       loadImage(baseDir + man.sky.file), loadImage(baseDir + man.skyline.file), loadImage(baseDir + disc.surface.file),
       loadScript(baseDir + man.crowd.lib, 'RPSOpenerLib'), loadScript(baseDir + man.crowd.file, 'paradeCrowd') ]);
@@ -228,9 +229,10 @@ function mount(host, opts){
       if(hy < WH + 40){
         g.drawImage(skylineImg, 0, hy - man.skyline.horizonRow);
         // the parade's crowd, cheering in real time, its rows spread (k) so it reaches the bottom of the frame from the mid-screen horizon
-        paradeCrowd.draw(CROWD.buf, t, { yh: hy, k: PR.roadBelow / paradeCrowd.ROAD_D, ox: 0, fast: true });   // its front row on the parade's road (opener-parade round 3: a shorter crowd, more float)
+        if(groundImg) g.drawImage(groundImg, 0, hy + PR.ground.below);   // the title's road under the crowd (look 'title')
+        paradeCrowd.draw(CROWD.buf, t, { yh: hy, k: man.crowd.draw.k, ox: 0, fast: true });   // its rows spread by k (manifest crowd.draw.k: the look's)
         new Uint32Array(CROWD.id.data.buffer).set(CROWD.buf); CROWD.g.putImageData(CROWD.id, 0, 0); g.drawImage(CROWD.cv, 0, 0);
-        parade(g, t, hy);   // the floats roll in front of the crowd
+        if(PR.look !== 'none') parade(g, t, hy);   // the floats roll in front of the crowd
       }
     }
 
@@ -249,7 +251,7 @@ function mount(host, opts){
     function parade(g, t, hy){
       const st = Math.floor(t * PR.stepsPerS); if(st < PR.steps.first || st > PR.steps.last) return;
       const road = hy + PR.roadBelow; if(road - 120 >= WH) return;
-      if(road < WH){ g.fillStyle = PAL[PR.road]; g.fillRect(0, road, WW, WH - road); }   // the road, under the wheels (below rps.plus's crop)
+      if(road < WH && !PR.ground){ g.fillStyle = PAL[PR.road]; g.fillRect(0, road, WW, WH - road); }   // the road, under the wheels (below rps.plus's crop)
       const head = PR.head + PR.speed * t;
       for(const r of route){ const x = Math.round(head - r.cum), f = r.f; if(x + f.dx >= WW) continue; if(x + f.dx + f.w <= 0) break;
         const i = f.index[(st - PR.steps.first) * f.phases + ((x & 7) % f.phases)];

@@ -1497,11 +1497,12 @@ const M = () => FAIR._film;   // the Fair's voices, handed out by sound.js's one
 // levels (round 11): the organ at 2 once the band is in; the band at 0.4 of its game level, a quarter of that in the pit; the
 // crowd twice the game's, -3 dB in the pit; far off on the stars (0.025), light after the flash (0.045)
 const ORGAN = 2, BAND = .4, PIT_BAND = .1, CROWD = .12, PIT_DIP = .7, CROWD_FAR = .025, CROWD_AFTER = .045;
-// the opening (owner, 2026-11-09, opener-parade round 3): the crowd's roar first, growing over the pan to `crowd` at
-// `crowdPeak` s, then easing back to CROWD over CROWD_EASE s as the music takes over; the music (the organ, then the band)
-// fades in slowly from the start to `musicLow` of its level at the pan's end and comes up to full by `musicFull` s.
-// The four tuners: the player hands play() a mix (mount's opts.mix) whose fields override these.
-const MIX = { crowd: .35, crowdPeak: 7.6, musicLow: .25, musicFull: 8.6 }, CROWD_EASE = 1.5;
+// the opening (owner, 2026-11-09, opener-parade round 4: "as soon as the pan starts, for the crowd to get louder and louder
+// ... from a physics standpoint ... the crowd is a larger thing"): far off on the stars, the crowd swells from the pan's start
+// to its roar (`crowd`) at the landing and holds it over the parade until the pit; the parade's music (the organ, then the
+// band) comes in at `musicIn` s, a far sound, `musicLow` of its level by the landing and full by `musicFull` s, under the roar.
+// The player may hand play() a mix (mount's opts.mix) whose fields override these.
+const MIX = { crowd: 1.8, musicIn: 4.4, musicLow: .4, musicFull: 9 };
 // the count: the music dips to 35 % under each word and comes back over 0.3 s
 const DIP = .35, DIP_BACK = .3;
 // the ending: the Fair's output fades to silence over FADE seconds on (1 - x)^2, ending at the film's end
@@ -1517,15 +1518,17 @@ function holdNow(p, t){ try { if(p.cancelAndHoldAtTime){ p.cancelAndHoldAtTime(t
 function later(tk, t, fn){ tk.timers.push(setTimeout(() => { if(take === tk) fn(); }, Math.max(0, (t - AU.ac.currentTime) * 1000))); }
 function viaTake(tk, fn){ const m = AU.master; AU.master = tk.g; try { fn(); } finally { AU.master = m; } }
 
-function crowdIn(tk, a, peak, eased, mix){ later(tk, a, () => { M().ready(); const now = AU.ac.currentTime; tk.C = M().crowdStart(CROWD_FAR, now);
-  tk.C.to(mix.crowd, now, Math.max(.1, peak - now)); });   // the roar, growing over the pan
-  later(tk, peak, () => { if(tk.C) tk.C.to(CROWD, AU.ac.currentTime, Math.max(.1, eased - peak)); }); }
+function crowdIn(tk, a, pan0, pan1, mix){ later(tk, a, () => { M().ready(); tk.C = M().crowdStart(CROWD_FAR, AU.ac.currentTime); });   // far off, on the stars
+  // nearer and nearer as the camera comes down: a third of the roar at the pan's middle, the whole of it on the landing
+  const mid = (pan0 + pan1) / 2;
+  later(tk, pan0, () => { if(tk.C) tk.C.to(mix.crowd / 3, AU.ac.currentTime, Math.max(.1, mid - AU.ac.currentTime)); });
+  later(tk, mid, () => { if(tk.C) tk.C.to(mix.crowd, AU.ac.currentTime, Math.max(.1, pan1 - AU.ac.currentTime)); }); }
 // the organ (the Naming's loop, FAIR.namingBack) faded in over `secs`, its bars pinned to `grid`
 function organIn(tk, a, secs, grid, land, mix){ later(tk, a, () => { FAIR.namingBack(secs); const n = M().nm; if(n){ n.grid = grid; n.k = Math.max(1, n.k);
   n.to(ORGAN * mix.musicLow, AU.ac.currentTime, Math.max(.1, land - AU.ac.currentTime)); } }); }   // slowly, to musicLow by the landing
 // the band joining under the organ (FAIR.sponsor, the organ kept up), then the crowd up
 function bandJoins(tk, a, secs, full, mix){
-  later(tk, a, () => {
+  later(tk, a, () => {   // the parade's band, far off: in from `a`, musicLow of its level by the landing
     FAIR.sponsor(secs);
     const now = AU.ac.currentTime, b = M().band, n = M().nm, land = a + secs;
     if(b){ const g = b.g.gain; g.cancelScheduledValues(now); g.setValueAtTime(0, now); g.linearRampToValueAtTime(BAND * mix.musicLow, now + secs); }
@@ -1576,10 +1579,10 @@ const gridOf = tl => tl.words[0] - 22 * BEAT;
 
 // the whole score from audio time T (the film's 0:00); tl is manifest.json's timeline
 function trailer(tk, T, tl, mix){
-  const at = f => T + f, g0 = gridOf(tl);
-  crowdIn(tk, at(g0 - .1), at(mix.crowdPeak), at(mix.crowdPeak + CROWD_EASE), mix);
-  organIn(tk, at(g0 - .1), 1.6, at(g0), at(tl.pan1), mix);
-  bandJoins(tk, at(tl.pan0), tl.pan1 - tl.pan0, at(mix.musicFull), mix);
+  const at = f => T + f, g0 = gridOf(tl), mi = Math.min(mix.musicIn, tl.pan1 - .5);
+  crowdIn(tk, at(g0 - .1), at(tl.pan0), at(tl.pan1), mix);
+  organIn(tk, at(mi), .5, at(g0), at(tl.pan1), mix);   // the organ's bars stay on the grid from 0.85 s, so ROCK lands on its beat
+  bandJoins(tk, at(mi), tl.pan1 - mi, at(mix.musicFull), mix);
   bandDown(tk, at(tl.pit), tl.pitIn);
   buildUp(tk, at(tl.pit), tl.words.map(at));
   flashOut(tk, at(tl.dark));
