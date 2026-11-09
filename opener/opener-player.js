@@ -19,8 +19,10 @@
    (speaker.html's BODY, CROSS and WAVES, 14 x 11 pixels at two screen pixels a pixel) is an inline SVG made once per look,
    never per frame: the film's redraws and its 30 fps gate are untouched.
 
-   RPSOpener.mount(el, { base: './', autoplay: true }) -> { ready, soundReady, sound(on), replay(), seek(t), stats, duration }
+   RPSOpener.mount(el, { base: './', autoplay: true, paradeStart }) -> { ready, soundReady, sound(on), replay(), seek(t), stats, duration }
      base        the folder the baked files are in (the page's URL resolves it)
+     paradeStart the parade's loop starts at this float (0 to 11, manifest.parade.order) on every play; left out, each play
+                 (the first, replay(), sound(true)) picks one at random. The checks and the test page's ?parade=<n> fix it
      ready       a promise: files loaded and the first frame drawn
      soundReady  a promise: true once sound.js (the game's sound code and the film's score, ~110 KB) has loaded, which starts
                  after the first frame is drawn so it never delays it; false under reduced motion (no sound) or if it fails
@@ -88,7 +90,7 @@ const css = base => `
 .rpso .stage .w6{ top:440px; display:flex; flex-wrap:nowrap; justify-content:center; align-items:baseline; column-gap:9px; row-gap:0 }   /* ROCK PAPER SCISSORS plus in one line under Mars (his feet on row 415) */
 .rpso .stage .w6 div{ font-size:34px; text-shadow:0 4px 0 var(--ink), 4px 0 0 var(--ink), -4px 0 0 var(--ink), 0 -4px 0 var(--ink) }   /* the title line's ink edge */
 .rpso .stage .w6 .lc{ font-size:34px; transform:skewX(-12deg); margin:0 }
-.rpso .stage .rules{ left:16px; right:16px; top:568px; text-align:center; font:28px/1.2 var(--f-display); white-space:nowrap; color:var(--cream) }   /* at the address's size */
+.rpso .stage .rules{ left:16px; right:16px; top:568px; text-align:center; font:12px/1.6 var(--f-chrome); letter-spacing:.22em; white-space:nowrap; color:var(--brass) }   /* a footnote in the alpha line's own style (owner, 2026-11-09, fair-trailer round 16: A) */
 .rpso .stage .url{ left:8px; right:8px; top:524px; text-align:center; font:28px/1.2 var(--f-display); letter-spacing:.04em; color:var(--cream) }
 .rpso .stage .alpha{ left:16px; right:16px; top:487px; text-align:center; font:12px/1.6 var(--f-chrome); letter-spacing:.22em; color:var(--brass) }
 /* Mars's line: the game's speech bubble (src/css/12b-say.css), its stepped tail (21b-say.js sayTailShadow) turned over to point down at him; its pop-in is drawn from the clock */
@@ -162,6 +164,8 @@ function mount(host, opts){
     const { disc, pit } = man, W = man.world, PAN = W.pan, H16 = man.world.horizon, MARS_X = disc.x, NU = disc.surface.w;
     const MK = pit.mk, MX = pit.mx, MY = pit.my, SMOKE_UP = pit.smokeUp, CHIMNEY = pit.chimney;
 
+    const PR = man.parade, floatImgs = {};   // the parade's floats (docs/plans/2026-11-09-opener-parade-plan.md)
+    await Promise.all(PR.order.map(async k => { floatImgs[k] = await loadImage(baseDir + PR.floats[k].file); }));
     const [skyImg, skylineImg, surfImg, lib, paradeCrowd] = await Promise.all([
       loadImage(baseDir + man.sky.file), loadImage(baseDir + man.skyline.file), loadImage(baseDir + disc.surface.file),
       loadScript(baseDir + man.crowd.lib, 'RPSOpenerLib'), loadScript(baseDir + man.crowd.file, 'paradeCrowd') ]);
@@ -225,7 +229,30 @@ function mount(host, opts){
         // the parade's crowd, cheering in real time, its rows spread (k) so it reaches the bottom of the frame from the mid-screen horizon
         paradeCrowd.draw(CROWD.buf, t, { yh: hy, k: (WH - (H16 - PAN)) / paradeCrowd.ROAD_D, ox: 0, fast: true });
         new Uint32Array(CROWD.id.data.buffer).set(CROWD.buf); CROWD.g.putImageData(CROWD.id, 0, 0); g.drawImage(CROWD.cv, 0, 0);
+        parade(g, t, hy);   // the floats roll in front of the crowd
       }
+    }
+
+    // ----- the parade (docs/plans/2026-11-09-opener-parade-plan.md): the game's twelve floats in their loop, from a start picked
+    // at random each play (the game's title starts its parade at a random float every visit: buildRoute), or opts.paradeStart.
+    // Float i's left edge is head + speed * t - cum_i; each steps at 8 a second, its frame picked by its step and column (x & 7)
+    // from the baked sheets, its wheels roadBelow rows under the horizon, on a brass-light road. -----
+    let route = [];
+    function newRoute(){
+      const n = PR.order.length, s0 = opts.paradeStart != null ? ((opts.paradeStart | 0) % n + n) % n : Math.floor(Math.random() * n);
+      route = []; let cum = 0;
+      for(let i = 0; i < 2 * n; i++){ const k = PR.order[(s0 + i) % n]; route.push({ k, f: PR.floats[k], img: floatImgs[k], cum }); cum += PR.floats[k].chassis + PR.gap; }
+      stats.paradeStart = s0;
+    }
+    newRoute();
+    function parade(g, t, hy){
+      const st = Math.floor(t * PR.stepsPerS); if(st < PR.steps.first || st > PR.steps.last) return;
+      const road = hy + PR.roadBelow; if(road - 120 >= WH) return;
+      if(road < WH){ g.fillStyle = PAL[PR.road]; g.fillRect(0, road, WW, WH - road); }   // the road, under the wheels (below rps.plus's crop)
+      const head = PR.head + PR.speed * t;
+      for(const r of route){ const x = Math.round(head - r.cum), f = r.f; if(x + f.dx >= WW) continue; if(x + f.dx + f.w <= 0) break;
+        const i = f.index[(st - PR.steps.first) * f.phases + ((x & 7) % f.phases)];
+        g.drawImage(r.img, 0, i * f.h, f.w, f.h, x + f.dx, road + f.dy, f.w, f.h); }
     }
 
     // ===== the stage (round 16's makeStage) =====
@@ -345,7 +372,7 @@ function mount(host, opts){
         draw(t); }
       raf = requestAnimationFrame(loop);
     }
-    function run(){ stop(); replayBtn.style.visibility = 'hidden'; playing = true; gate.last = null; raf = requestAnimationFrame(loop); }
+    function run(){ newRoute(); stop(); replayBtn.style.visibility = 'hidden'; playing = true; gate.last = null; raf = requestAnimationFrame(loop); }
     function soundOff(){ if(T0 == null) return; const t = audioT(performance.now()); SND.stop(); T0 = null; stats.clock = 'page'; stats.soundT0 = null; paintSpk(false); return t; }
     function sound(on){
       if(!on){ const was = playing, t = soundOff();   // the film runs on, silent, from where it is
