@@ -154,9 +154,10 @@
   </script>
   <script src="opener/opener-player.js"></script>
   <script>
-    // ?autoplay=0 holds the film still (for screenshots)
+    // ?autoplay=0 holds the film still and ?parade=0..11 starts the parade's loop at that float (for screenshots)
+    const q = new URLSearchParams(location.search), pk = q.get('parade');
     window.film = RPSOpener.mount(document.getElementById('opener'),
-      { base: 'opener/', autoplay: !/[?&]autoplay=0/.test(location.search) });
+      { base: 'opener/', autoplay: q.get('autoplay') !== '0', paradeStart: pk == null ? null : +pk });
     document.querySelector('#opener .box').appendChild(document.querySelector('.below'));
   </script>
 </body>
