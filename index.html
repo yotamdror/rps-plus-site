@@ -99,7 +99,8 @@
   .below .notify input { width: min(44vw, 150px); }
   .below .notify small { max-width: 200px; }
   /* sent: the chip becomes a box the Replay button's size (160 x 44) */
-  .below .chip:has(.notify.sent) { padding: 0; width: 160px; height: 44px; box-sizing: border-box; justify-content: center; }
+  /* no outline once sent: "you're in" is a message, not a button (Replay keeps its own outline) */
+  .below .chip:has(.notify.sent) { padding: 0; width: 160px; height: 44px; box-sizing: border-box; justify-content: center; border-color: transparent; }
   .below .notify.sent form { padding: 0; gap: 0; }
   .below .notify.sent .noted { padding: 0; margin: 0; white-space: nowrap; }
 </style>
