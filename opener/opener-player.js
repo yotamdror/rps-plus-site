@@ -333,9 +333,9 @@ function mount(host, opts){
         w.style.opacity = ''; w.style.transform = f === 0 ? 'scale(1.35)' : f === 1 ? 'scale(.96)' : '';
         if(f === 0 && i < 3){ S.flash.hidden = false; S.flash.style.background = THROW_HEX[THROWS[i]]; S.flash.style.opacity = '.12'; } });
     }
-    function sayAt(S, t){   // "Oh, please no" from a second before the flash to the flash; the game's sayIn (0.34 s, five steps to 60 %, five more) drawn from the clock
+    function sayAt(S, t){   // "Please no" (owner, 2026-11-09) from a second before the flash to the flash; the game's sayIn (0.34 s, five steps to 60 %, five more) drawn from the clock
       const at = T16.dark - 1; if(t < at || t >= T16.dark) return;
-      S.say.hidden = false; if(S.say.firstChild.textContent !== 'Oh, please no') S.say.firstChild.textContent = 'Oh, please no';
+      S.say.hidden = false; if(S.say.firstChild.textContent !== 'Please no') S.say.firstChild.textContent = 'Please no';
       const a = t - at, d = .34; let op = 1, sc = 1;
       if(a < .6 * d){ const q = Math.floor(a / (.6 * d) * 5) / 5; op = q; sc = .3 + .82 * q; }
       else if(a < d){ const q = Math.floor((a - .6 * d) / (.4 * d) * 5) / 5; sc = 1.12 - .12 * q; }
