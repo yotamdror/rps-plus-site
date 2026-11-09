@@ -1,7 +1,7 @@
 /* The opener film's sound (docs/plans/2026-11-07-opener-trailer-plan.md, step 5; written by scripts/marketing/build-opener.mjs).
    The game's own sound code, copied whole from src/ (the knobs, the engine AU, the Fair FAIR), and the film's score after it
    (scripts/marketing/opener-score.js, round 11's), in one closure. The player loads this after the film's first frame.
-   window.RPSOpenerSound = { wake(), play(timeline) -> T, stop(), heard(perfNow) -> audio time, AU, FAIR } */
+   window.RPSOpenerSound = { wake(), play(timeline, mix) -> T, stop(), heard(perfNow) -> audio time, AU, FAIR, LEAD, MIX } */
 window.RPSOpenerSound = (function(){
 /* stubs for the two game globals the engine's fight loop reads (src/js/02-state.js G, src/js/27-pause.js paused) */
 var G = { heat:0 }; var paused = false;
@@ -1497,6 +1497,11 @@ const M = () => FAIR._film;   // the Fair's voices, handed out by sound.js's one
 // levels (round 11): the organ at 2 once the band is in; the band at 0.4 of its game level, a quarter of that in the pit; the
 // crowd twice the game's, -3 dB in the pit; far off on the stars (0.025), light after the flash (0.045)
 const ORGAN = 2, BAND = .4, PIT_BAND = .1, CROWD = .12, PIT_DIP = .7, CROWD_FAR = .025, CROWD_AFTER = .045;
+// the opening (owner, 2026-11-09, opener-parade round 3): the crowd's roar first, growing over the pan to `crowd` at
+// `crowdPeak` s, then easing back to CROWD over CROWD_EASE s as the music takes over; the music (the organ, then the band)
+// fades in slowly from the start to `musicLow` of its level at the pan's end and comes up to full by `musicFull` s.
+// The four tuners: the player hands play() a mix (mount's opts.mix) whose fields override these.
+const MIX = { crowd: .35, crowdPeak: 7.6, musicLow: .25, musicFull: 8.6 }, CROWD_EASE = 1.5;
 // the count: the music dips to 35 % under each word and comes back over 0.3 s
 const DIP = .35, DIP_BACK = .3;
 // the ending: the Fair's output fades to silence over FADE seconds on (1 - x)^2, ending at the film's end
@@ -1512,19 +1517,25 @@ function holdNow(p, t){ try { if(p.cancelAndHoldAtTime){ p.cancelAndHoldAtTime(t
 function later(tk, t, fn){ tk.timers.push(setTimeout(() => { if(take === tk) fn(); }, Math.max(0, (t - AU.ac.currentTime) * 1000))); }
 function viaTake(tk, fn){ const m = AU.master; AU.master = tk.g; try { fn(); } finally { AU.master = m; } }
 
-function crowdIn(tk, a){ later(tk, a, () => { M().ready(); tk.C = M().crowdStart(CROWD_FAR, AU.ac.currentTime); }); }
+function crowdIn(tk, a, peak, eased, mix){ later(tk, a, () => { M().ready(); const now = AU.ac.currentTime; tk.C = M().crowdStart(CROWD_FAR, now);
+  tk.C.to(mix.crowd, now, Math.max(.1, peak - now)); });   // the roar, growing over the pan
+  later(tk, peak, () => { if(tk.C) tk.C.to(CROWD, AU.ac.currentTime, Math.max(.1, eased - peak)); }); }
 // the organ (the Naming's loop, FAIR.namingBack) faded in over `secs`, its bars pinned to `grid`
-function organIn(tk, a, secs, grid){ later(tk, a, () => { FAIR.namingBack(secs); const n = M().nm; if(n){ n.grid = grid; n.k = Math.max(1, n.k); } }); }
+function organIn(tk, a, secs, grid, land, mix){ later(tk, a, () => { FAIR.namingBack(secs); const n = M().nm; if(n){ n.grid = grid; n.k = Math.max(1, n.k);
+  n.to(ORGAN * mix.musicLow, AU.ac.currentTime, Math.max(.1, land - AU.ac.currentTime)); } }); }   // slowly, to musicLow by the landing
 // the band joining under the organ (FAIR.sponsor, the organ kept up), then the crowd up
-function bandJoins(tk, a, secs){
+function bandJoins(tk, a, secs, full, mix){
   later(tk, a, () => {
     FAIR.sponsor(secs);
-    const now = AU.ac.currentTime, b = M().band, n = M().nm;
-    if(b){ const g = b.g.gain; g.cancelScheduledValues(now); g.setValueAtTime(0, now); g.linearRampToValueAtTime(BAND, now + secs); }
-    if(n) n.to(ORGAN, now, secs);
+    const now = AU.ac.currentTime, b = M().band, n = M().nm, land = a + secs;
+    if(b){ const g = b.g.gain; g.cancelScheduledValues(now); g.setValueAtTime(0, now); g.linearRampToValueAtTime(BAND * mix.musicLow, now + secs); }
+    if(n) n.to(ORGAN * mix.musicLow, now, secs);
     const sc = M().crowd; if(sc) sc.stop(now, .05);   // the take's own crowd carries on instead
-    if(tk.C) tk.C.to(CROWD, now, secs);
   });
+  // the landing: the music up to full by `full`
+  later(tk, a + secs, () => { const now = AU.ac.currentTime, b = M().band, n = M().nm, d = Math.max(.1, full - now);
+    if(b){ const g = b.g.gain; holdNow(g, now); g.linearRampToValueAtTime(BAND, now + d); }
+    if(n) n.to(ORGAN, now, d); });
 }
 // the pit: the band down to a quarter with the dissolve
 function bandDown(tk, a, secs){ later(tk, a, () => { const b = M().band, now = AU.ac.currentTime; if(!b) return; const g = b.g.gain;
@@ -1564,11 +1575,11 @@ function ending(tk, chord, end){
 const gridOf = tl => tl.words[0] - 22 * BEAT;
 
 // the whole score from audio time T (the film's 0:00); tl is manifest.json's timeline
-function trailer(tk, T, tl){
+function trailer(tk, T, tl, mix){
   const at = f => T + f, g0 = gridOf(tl);
-  crowdIn(tk, at(g0 - .1));
-  organIn(tk, at(g0 - .1), 1.6, at(g0));
-  bandJoins(tk, at(tl.pan0), tl.pan1 - tl.pan0);
+  crowdIn(tk, at(g0 - .1), at(mix.crowdPeak), at(mix.crowdPeak + CROWD_EASE), mix);
+  organIn(tk, at(g0 - .1), 1.6, at(g0), at(tl.pan1), mix);
+  bandJoins(tk, at(tl.pan0), tl.pan1 - tl.pan0, at(mix.musicFull), mix);
   bandDown(tk, at(tl.pit), tl.pitIn);
   buildUp(tk, at(tl.pit), tl.words.map(at));
   flashOut(tk, at(tl.dark));
@@ -1597,7 +1608,7 @@ function wake(){
   return true;
 }
 // play(tl): a new take from 0:00, LEAD seconds ahead of now on the audio clock; returns that time (T), the film's 0:00
-function play(tl){
+function play(tl, mix){
   if(!AU.ok) return null;
   stopTake(.05);
   const ac = AU.ac, now = ac.currentTime, T = now + LEAD;
@@ -1607,7 +1618,9 @@ function play(tl){
   const tk = { T, timers: [], C: null, g: ac.createGain() };
   tk.g.connect(AU.master);
   take = tk;
-  trailer(tk, T, tl);
+  const m = { ...MIX }; if(mix) for(const k of Object.keys(MIX)){ const v = +mix[k]; if(isFinite(v)) m[k] = v; }
+  tk.mix = m;
+  trailer(tk, T, tl, m);
   return T;
 }
 // stop(): the Fair's output down fast (60 ms), the take stopped
@@ -1624,5 +1637,5 @@ function heard(now){
   return Math.max(0, ac.currentTime - (ac.outputLatency || ac.baseLatency || 0));
 }
 /* end of scripts/marketing/opener-score.js --- */
-return { wake, play, stop, heard, AU, FAIR, LEAD };
+return { wake, play, stop, heard, AU, FAIR, LEAD, MIX };
 })();

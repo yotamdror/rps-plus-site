@@ -129,10 +129,10 @@
   },
   "draw": {
    "yh": "horizon - cam",
-   "k": 3.1285714285714286,
+   "k": 2.6,
    "ox": 0,
    "fast": true,
-   "note": "k = (h - (horizon - pan)) / paradeCrowd.ROAD_D"
+   "note": "k = parade.roadBelow / paradeCrowd.ROAD_D: the front row on the parade's road"
   }
  },
  "pit": {
@@ -236,7 +236,7 @@
   ],
   "speed": 14,
   "head": 89,
-  "roadBelow": 185,
+  "roadBelow": 182,
   "stepsPerS": 8,
   "gap": 8,
   "steps": {
@@ -494,7 +494,7 @@
    "what": "SURF.mars before light, 1,024 longitudes x 209 rows"
   },
   "opener-player.js": {
-   "bytes": 37640,
+   "bytes": 37864,
    "what": "the film's player (RPSOpener.mount)",
    "from": "scripts/marketing/opener-player.js"
   },
@@ -511,7 +511,7 @@
    "what": "paintStatic skyline, trees, land (round 16 PARADE_BG)"
   },
   "sound.js": {
-   "bytes": 112601,
+   "bytes": 114087,
    "what": "the game's sound code (knobs, AU, FAIR, one patch) and the film's score; loaded after the first frame"
   },
   "sprites/mars-idle-2-nosmoke.png": {

@@ -21,6 +21,7 @@
 
    RPSOpener.mount(el, { base: './', autoplay: true, paradeStart }) -> { ready, soundReady, sound(on), replay(), seek(t), stats, duration }
      base        the folder the baked files are in (the page's URL resolves it)
+     mix         the opening's four tuners, read at each play (opener-score.js MIX): { crowd, crowdPeak, musicLow, musicFull }
      paradeStart the parade's loop starts at this float (0 to 11, manifest.parade.order) on every play; left out, each play
                  (the first, replay(), sound(true)) picks one at random. The checks and the test page's ?parade=<n> fix it
      ready       a promise: files loaded and the first frame drawn
@@ -227,7 +228,7 @@ function mount(host, opts){
       if(hy < WH + 40){
         g.drawImage(skylineImg, 0, hy - man.skyline.horizonRow);
         // the parade's crowd, cheering in real time, its rows spread (k) so it reaches the bottom of the frame from the mid-screen horizon
-        paradeCrowd.draw(CROWD.buf, t, { yh: hy, k: (WH - (H16 - PAN)) / paradeCrowd.ROAD_D, ox: 0, fast: true });
+        paradeCrowd.draw(CROWD.buf, t, { yh: hy, k: PR.roadBelow / paradeCrowd.ROAD_D, ox: 0, fast: true });   // its front row on the parade's road (opener-parade round 3: a shorter crowd, more float)
         new Uint32Array(CROWD.id.data.buffer).set(CROWD.buf); CROWD.g.putImageData(CROWD.id, 0, 0); g.drawImage(CROWD.cv, 0, 0);
         parade(g, t, hy);   // the floats roll in front of the crowd
       }
@@ -379,7 +380,7 @@ function mount(host, opts){
         if(was && t != null) start = performance.now() - Math.max(0, t, stats.t || 0) * 1000;
         return false; }
       if(reduced || !SND || !SND.wake()) return false;   // wake(): inside the caller's tap, before anything waits
-      const T = SND.play(T16); if(T == null) return false;
+      const T = SND.play(T16, opts.mix); if(T == null) return false;
       T0 = T; stats.clock = 'audio'; stats.soundT0 = T; stats.t = 0; paintSpk(true); run();   // the film from 0:00, on the audio clock
       return true;
     }
