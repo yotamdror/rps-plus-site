@@ -10,4 +10,4 @@ pushes the finished files here. Do not copy game source into this repository.
 - `.nojekyll` serves files as they are, with no Jekyll build.
 - `opener/` is the opener film, copied as built from `rps-plus`
   (`node scripts/marketing/build-opener.mjs`, then all of `dist/marketing/opener/` except its
-  `index.html`). A change to the film repeats that copy.
+  `index.html`; since 2026-11-09 that includes `floats/`, the parade's floats). A change to the film repeats that copy.
