@@ -130,6 +130,17 @@
     // Sign-ups go to the RPS+ Alpha Worker's notify table (rps-plus repo, site-signup):
     // stored only there, read only by us, never shown back.
     const API = 'https://rps-plus-alpha-staging.rps-plus.workers.dev/api/notify';
+    // Coarse context only (site-telemetry): screen size, the referring host and a ?l= tag (e.g. rps.plus/?l=friends-1).
+    // Country, region and browser are worked out by the Worker; no cookies, no ids, no IP kept.
+    const ctx = (() => {
+      const link = (new URLSearchParams(location.search).get('l') || '').toLowerCase();
+      let referrer = ''; try { referrer = document.referrer ? new URL(document.referrer).hostname : ''; } catch {}
+      if (referrer === location.hostname) referrer = '';
+      return { screen: `${screen.width}x${screen.height}`, referrer, link: /^[a-z0-9-]{1,32}$/.test(link) ? link : '' };
+    })();
+    try { // one page view; a failure is silent and never touches the page
+      fetch(API.replace(/notify$/, 'visit'), { method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' }, body: JSON.stringify(ctx) }).catch(() => {});
+    } catch {}
     const form = box.querySelector('form'), input = form.querySelector('input');
     const send = form.querySelector('.send'), note = form.querySelector('small');
     const say = (text, warn) => { note.textContent = text; note.classList.toggle('warn', !!warn); };
@@ -145,7 +156,7 @@
       try {
         const res = await fetch(API, {
           method: 'POST', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ email, source: 'site' }), signal: AbortSignal.timeout(10000)
+          body: JSON.stringify({ email, source: 'site', ...ctx }), signal: AbortSignal.timeout(10000)
         });
         if (res.status === 400) { say("That doesn't look like an email.", true); input.focus(); return; }
         if (!res.ok) throw new Error(res.status);
