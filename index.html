@@ -116,7 +116,9 @@
   /* ---- the feed: news and release notes under the film, newest first (README "The feed") ---- */
   @font-face { font-family: "Geist Pixel"; src: url(fonts/GeistPixel-400.woff2) format("woff2"); font-weight: 400 700; font-display: swap; }
   /* the first screen is the film alone; the feed starts at the screen's bottom edge */
-  .filmcol { width: 100%; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; }
+  /* the large viewport (100lvh = the whole screen): Safari's floating bottom bar sits over the page, so sizing to the
+     small viewport left the feed's top showing under it on the first screen (owner, iPhone 17) */
+  .filmcol { width: 100%; min-height: 100vh; min-height: 100lvh; display: flex; flex-direction: column; align-items: center; }
   @keyframes bob { 50% { transform: translateY(3px); } }
   .feed { width: 100%; box-sizing: border-box; max-width: 440px; margin: 0 auto; padding: 0 16px calc(56px + env(safe-area-inset-bottom));
     color: var(--cream); font: 18px/1.5 "Geist Pixel", system-ui, sans-serif; font-variant-ligatures: none; }
@@ -164,6 +166,8 @@
   .rn-steps { list-style: none; margin: 0; }
   .rn-step { color: var(--cream); }
   .rn-n { display: none; }
+  /* the challenge's terms: boxed so nobody misses them */
+  .deal { margin: 4px 0 14px; padding: 12px 14px 2px; background: var(--charcoal); border: 2px solid var(--brass-light); color: var(--cream); }
   .post .coda { margin: 64px 0 0; max-width: 34em; }
   .none { color: var(--grey); padding: 24px 0; }
   .end { border-top: 1px solid var(--slate); margin-top: 32px; padding-top: 20px; display: grid; gap: 14px; justify-items: start; }
@@ -250,7 +254,7 @@
             <div class="kicker"><span class="rn-n">4 / 5 · </span>Better</div><h2>Swipe Right Anywhere.</h2><p>Same swipe as before, just from anywhere on the screen: up for Paper, left for Rock, right for Scissors.</p>
           </li>
           <li class="rn-step" data-step="4" tabindex="0">
-            <div class="kicker"><span class="rn-n">5 / 5 · </span>Challenge</div><h2>Beat your old score</h2><p>This is Rafa's board: one run, 12,741, 22nd in the world. Not very impressive. A new YOUR RUNS screen now shows all your individual runs. Beat your own best score by Tuesday, November 24 and I'll send you 25 cents USA in cold hard cash.</p><p>Screenshot your new best on YOUR RUNS, then text it to me with your mailing address. One per player, by Tuesday, November 24.</p><div class="cap">Pictured: Rafa's real run</div>
+            <div class="kicker"><span class="rn-n">5 / 5 · </span>Challenge</div><h2>Beat your old score</h2><p>This is Rafa's board: one run, 12,741, 22nd in the world. Not very impressive. A new YOUR RUNS screen now shows all your individual runs.</p><div class="deal"><p>Beat your own best score by Tuesday, November 24 and I'll send you 25 cents USA in cold hard cash.</p><p>Screenshot your new best on YOUR RUNS, then text it to me with your mailing address. One per player, by Tuesday, November 24.</p></div><div class="cap">Pictured: Rafa's real run</div>
           </li>
         </ol>
       </div>
