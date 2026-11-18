@@ -428,6 +428,15 @@
       const sync = () => { more.style.visibility = still || rb.style.visibility === 'visible' ? 'visible' : 'hidden'; };
       new MutationObserver(sync).observe(rb, { attributes: true, attributeFilter: ['style'] }); sync();
     })();
+    // phones and tablets: the first screen is at least the device's whole screen tall. Safari's floating bottom bar
+    // (iOS 26) sits over the page and its viewport units stop short of the screen's edge, so the feed's top peeked
+    // under the bar (owner, iPhone 17). screen.height is the physical screen in CSS px; iOS never swaps it on rotation
+    if (matchMedia('(pointer: coarse)').matches) {
+      const col = document.querySelector('.filmcol');
+      const fit = () => { const a = screen.width, b = screen.height;
+        col.style.minHeight = (innerWidth > innerHeight ? Math.min(a, b) : Math.max(a, b)) + 'px'; };
+      fit(); addEventListener('resize', fit); addEventListener('orientationchange', fit);
+    }
     const h = location.hash.slice(1); if (TAGS.includes(h)) show(h, true);
     update();
   </script>
