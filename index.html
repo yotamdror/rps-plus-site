@@ -120,7 +120,7 @@
   @keyframes bob { 50% { transform: translateY(3px); } }
   .feed { width: 100%; box-sizing: border-box; max-width: 440px; margin: 0 auto; padding: 0 16px calc(56px + env(safe-area-inset-bottom));
     color: var(--cream); font: 18px/1.5 "Geist Pixel", system-ui, sans-serif; font-variant-ligatures: none; }
-  .feed .kicker { font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--brass-light); }
+  .feed .kicker { font: 13px "Silkscreen", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--brass-light); }
   .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 0 4px; background: var(--ink); }
   .ftag, .tag { all: unset; cursor: pointer; box-sizing: border-box; font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; }
   .ftag { min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid var(--slate); color: var(--brass-light); }
@@ -129,7 +129,8 @@
   .post { border-top: 1px solid var(--slate); padding: 24px 0 8px; margin-top: 16px; position: relative; }
   .post .anchor { position: absolute; top: -10px; }
   .meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .tag { color: var(--ink); background: var(--brass-light); padding: 3px 7px 2px; }
+  .tag { color: var(--ink); background: var(--brass-light); padding: 4px 8px 3px; font-size: 12px; }
+  .meta .kicker { color: var(--cream); font-size: 13px; letter-spacing: .08em; }
   .post h1 { font: 44px/1 "Jersey 25", ui-monospace, monospace; letter-spacing: .02em; margin: 10px 0 4px; font-weight: 400; text-wrap: balance; }
   .post h2 { font: 30px/1.05 "Jersey 25", ui-monospace, monospace; letter-spacing: .02em; font-weight: 400; margin: 6px 0 6px; }
   .post p { margin: 0 0 12px; }
@@ -163,7 +164,7 @@
   .rn-steps { list-style: none; margin: 0; }
   .rn-step { color: var(--cream); }
   .rn-n { display: none; }
-  .coda { margin: 24px 0 0; }
+  .post .coda { margin: 64px 0 0; max-width: 34em; }
   .none { color: var(--grey); padding: 24px 0; }
   .end { border-top: 1px solid var(--slate); margin-top: 32px; padding-top: 20px; display: grid; gap: 14px; justify-items: start; }
   .cta { display: inline-block; padding: 0 18px; background: var(--cream); color: var(--ink); text-decoration: none; font: 24px/48px "Jersey 25", ui-monospace, monospace; letter-spacing: .04em; }
@@ -199,7 +200,9 @@
     .rn-step:first-child { padding-top: 0; }
     .rn-step + .rn-step { border-top: 1px dashed var(--slate); }
     .rn-step.on { opacity: 1; cursor: default; }
-    .rn-step.two { margin-bottom: 40vh; margin-bottom: 40dvh; }   /* room for the second stop: BEFORE, then AFTER */
+    .rn-step.two { margin-bottom: 40vh; margin-bottom: 40dvh; }
+    /* the closing line sits in the notes column, under the notes, not under the loop */
+    .post .coda { margin: 72px 0 0 calc((100% - 40px) / 2.1 + 40px); }   /* room for the second stop: BEFORE, then AFTER */
     .post h1 { font-size: 52px; }
     .post h2 { font-size: 34px; }
   }
