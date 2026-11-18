@@ -190,15 +190,15 @@
     .filters { position: sticky; top: 0; z-index: 3; padding: 12px 0 10px; box-shadow: 0 1px 0 var(--slate); }
     .rn-story { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 40px; align-items: start; margin-top: 12px; }
     .rn-pin { top: 70px; align-items: flex-end; }
-    .rn-hud { width: min(100%, calc((100dvh - 130px) * 393 / 852)); font-size: 13px; }
+    .rn-hud { width: min(100%, calc((100vh - 130px) * 393 / 852)); width: min(100%, calc((100dvh - 130px) * 393 / 852)); font-size: 13px; }
     .rn-bars i { width: 32px; height: 5px; }
-    .rn-reel { width: min(100%, calc((100dvh - 130px) * 393 / 852)); }
-    .rn-steps { padding: 0 0 50dvh; }
+    .rn-reel { width: min(100%, calc((100vh - 130px) * 393 / 852)); width: min(100%, calc((100dvh - 130px) * 393 / 852)); }
+    .rn-steps { padding: 0 0 50vh; padding: 0 0 50dvh; }
     .rn-step { padding: 18px 0 22px; opacity: .3; cursor: pointer; transition: opacity .3s; }
     .rn-step:first-child { padding-top: 0; }
     .rn-step + .rn-step { border-top: 1px dashed var(--slate); }
     .rn-step.on { opacity: 1; cursor: default; }
-    .rn-step.two { margin-bottom: 40dvh; }   /* room for the second stop: BEFORE, then AFTER */
+    .rn-step.two { margin-bottom: 40vh; margin-bottom: 40dvh; }   /* room for the second stop: BEFORE, then AFTER */
     .post h1 { font-size: 52px; }
     .post h2 { font-size: 34px; }
   }
@@ -372,7 +372,10 @@
       s.bars.forEach((b, k) => { b.classList.toggle('on', k === i); b.classList.toggle('done', k < i); });
       if (s.count) s.count.textContent = i + 1;
       const next = s.vids.find(v => +v.dataset.step === i && +v.dataset.part === part);
-      s.vids.forEach(v => { v.classList.remove('gone-left', 'gone-right');
+      // a clip still parked from an earlier change goes straight back offstage, unseen (no slide across the reel)
+      s.vids.forEach(v => { if (v.classList.contains('gone-left') || v.classList.contains('gone-right')) {
+        v.style.transition = 'none'; v.classList.remove('gone-left', 'gone-right'); void v.offsetWidth; v.style.transition = ''; } });
+      s.vids.forEach(v => {
         if (v.classList.contains('on')) { v.classList.remove('on'); if (!still) v.classList.add(fwd ? 'gone-left' : 'gone-right');
           setTimeout(() => { if (!v.classList.contains('on')) { v.pause(); v.currentTime = 0; } }, 600); } });
       if (!still) { next.style.transition = 'none'; next.classList.toggle('from-left', !fwd); void next.offsetWidth; next.style.transition = ''; }
@@ -394,10 +397,12 @@
     addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; update(); }); } }, { passive: true });
     addEventListener('resize', update);
     // load the loops only when the story comes near; play only while its stage is on screen
+    const load = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return;
+      stories.find(x => x.stage === e.target).vids.forEach(x => { if (x.preload === 'none') x.preload = 'auto'; }); }), { rootMargin: '300px 0px' });
     const io = new IntersectionObserver(es => es.forEach(e => { const s = stories.find(x => x.stage === e.target); s.near = e.isIntersecting;
       const v = s.vids.find(x => x.classList.contains('on'));
-      if (s.near) { s.vids.forEach(x => { if (x.preload === 'none') x.preload = 'auto'; }); if (v) play(v); } else s.vids.forEach(x => x.pause()); }), { rootMargin: '300px 0px' });
-    stories.forEach(s => io.observe(s.stage));
+      if (s.near) { if (v) play(v); } else s.vids.forEach(x => x.pause()); }));
+    stories.forEach(s => { load.observe(s.stage); io.observe(s.stage); });
     // tap a dimmed note (iPad, computer): scroll it to the lit spot
     stories.forEach(s => s.steps.forEach(st => st.addEventListener('click', () => {
       if (!wide.matches || st.classList.contains('on')) return;
@@ -411,7 +416,7 @@
       more.innerHTML = '<svg class="ar" width="10" height="6" viewBox="0 0 5 3" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 0h5v1H0zM1 1h3v1H1zM2 2h1v1H2z"/></svg><span>Scroll for more</span>';
       row.append(more);
       more.onclick = e => { e.preventDefault(); document.getElementById('this-week').scrollIntoView({ behavior: still ? 'auto' : 'smooth' }); };
-      const sync = () => { more.style.visibility = rb.style.visibility === 'visible' ? 'visible' : 'hidden'; };
+      const sync = () => { more.style.visibility = still || rb.style.visibility === 'visible' ? 'visible' : 'hidden'; };
       new MutationObserver(sync).observe(rb, { attributes: true, attributeFilter: ['style'] }); sync();
     })();
     const h = location.hash.slice(1); if (TAGS.includes(h)) show(h, true);
