@@ -112,10 +112,158 @@
   .below .chip:has(.notify.sent) { padding: 0; width: 160px; height: 44px; box-sizing: border-box; justify-content: center; border-color: transparent; }
   .below .notify.sent form { padding: 0; gap: 0; }
   .below .notify.sent .noted { padding: 0; margin: 0; white-space: nowrap; }
+
+  /* ---- the feed: news and release notes under the film, newest first (README "The feed") ---- */
+  @font-face { font-family: "Geist Pixel"; src: url(fonts/GeistPixel-400.woff2) format("woff2"); font-weight: 400 700; font-display: swap; }
+  /* the first screen is the film alone; the feed starts at the screen's bottom edge */
+  .filmcol { width: 100%; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; }
+  @keyframes bob { 50% { transform: translateY(3px); } }
+  .feed { width: 100%; box-sizing: border-box; max-width: 440px; margin: 0 auto; padding: 0 16px calc(56px + env(safe-area-inset-bottom));
+    color: var(--cream); font: 18px/1.5 "Geist Pixel", system-ui, sans-serif; font-variant-ligatures: none; }
+  .feed .kicker { font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--brass-light); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 0 4px; background: var(--ink); }
+  .ftag, .tag { all: unset; cursor: pointer; box-sizing: border-box; font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .14em; text-transform: uppercase; }
+  .ftag { min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid var(--slate); color: var(--brass-light); }
+  .ftag.on { background: var(--cream); border-color: var(--cream); color: var(--ink); }
+  .ftag:focus-visible, .tag:focus-visible, .cta:focus-visible, .rn-step:focus-visible { outline: 2px solid var(--cream); outline-offset: 2px; }
+  .post { border-top: 1px solid var(--slate); padding: 24px 0 8px; margin-top: 16px; position: relative; }
+  .post .anchor { position: absolute; top: -10px; }
+  .meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tag { color: var(--ink); background: var(--brass-light); padding: 3px 7px 2px; }
+  .post h1 { font: 44px/1 "Jersey 25", ui-monospace, monospace; letter-spacing: .02em; margin: 10px 0 4px; font-weight: 400; text-wrap: balance; }
+  .post h2 { font: 30px/1.05 "Jersey 25", ui-monospace, monospace; letter-spacing: .02em; font-weight: 400; margin: 6px 0 6px; }
+  .post p { margin: 0 0 12px; }
+  .feed .cap { font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--warm-grey); }
+  /* the film's end: a second box beside Replay points down the page (the script below builds the row) */
+  .endrow { display: flex; justify-content: center; gap: 8px; margin: 10px auto 0; }
+  #opener .endrow .replay { margin: 0; min-width: 0; flex: 0 1 150px; min-height: 44px; box-sizing: border-box; }
+  .more { all: unset; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 0 1 auto; min-height: 44px; padding: 0 12px; border: 1px solid var(--brass-light); color: var(--brass-light);
+    font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; visibility: hidden; box-sizing: border-box; }
+  @media (max-width: 370px) { .more { white-space: normal; flex: 0 1 160px; } }
+  .more .ar { animation: bob 1.2s steps(2) infinite; }
+  .more:focus-visible { outline: 2px solid var(--cream); outline-offset: 2px; }
+
+  /* a release note is a story: its loop holds still on the stage while the notes scroll; the lit note's loop shows.
+     A change slides the old loop out and the new one in from the side you scrolled toward */
+  .rn-pin { position: sticky; top: 0; z-index: 2; background: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 8px; box-sizing: border-box; }
+  .rn-hud { display: flex; align-items: center; gap: 10px; font: 11px "Silkscreen", ui-monospace, monospace; letter-spacing: .14em; color: var(--brass-light); }
+  .rn-count b { color: var(--cream); font-weight: 400; }
+  .rn-bars { display: flex; gap: 4px; }
+  .rn-bars i { display: block; width: 22px; height: 4px; background: var(--slate); transition: background .3s; }
+  .rn-bars i.done { background: var(--warm-grey); }
+  .rn-bars i.on { background: var(--brass-light); }
+  .rn-reel { position: relative; max-width: 100%; aspect-ratio: 393 / 852; border: 1px solid var(--slate); background: #000; box-sizing: border-box; overflow: hidden; transition: border-color .5s; }
+  .rn-reel.flash { border-color: var(--brass-light); transition: none; }
+  .rn-reel .loop { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transform: translateX(100%); visibility: hidden;
+    transition: transform .55s cubic-bezier(.3, 0, .2, 1), visibility 0s .55s; }
+  .rn-reel .loop.on { transform: none; visibility: visible; transition: transform .55s cubic-bezier(.3, 0, .2, 1); }
+  .rn-reel .loop.from-left { transform: translateX(-100%); }
+  .rn-reel .loop.gone-left { transform: translateX(-100%); visibility: visible; }
+  .rn-reel .loop.gone-right { transform: translateX(100%); visibility: visible; }
+  .rn-steps { list-style: none; margin: 0; }
+  .rn-step { color: var(--cream); }
+  .rn-n { display: none; }
+  .none { color: var(--grey); padding: 24px 0; }
+  .end { border-top: 1px solid var(--slate); margin-top: 32px; padding-top: 20px; display: grid; gap: 14px; justify-items: start; }
+  .cta { display: inline-block; padding: 0 18px; background: var(--cream); color: var(--ink); text-decoration: none; font: 24px/48px "Jersey 25", ui-monospace, monospace; letter-spacing: .04em; }
+  .cta:active { background: var(--brass-light); }
+
+  /* phones: the loop fills the whole screen and holds still; each note is a see-through card that scrolls up over it,
+     a screen apart, so between cards the loop shows whole. The card's kicker carries the count */
+  @media (max-width: 699px) {
+    .rn-story { margin: 0 -16px; }
+    .rn-pin { height: 100vh; height: 100dvh; padding: 0; gap: 0; }
+    .rn-hud { display: none; }
+    .rn-reel { width: 100%; height: 100%; max-width: none; aspect-ratio: auto; border: 0; }
+    .rn-steps { position: relative; z-index: 3; margin-top: -100vh; margin-top: -100dvh; padding: 80vh 16px 35vh; padding: 80dvh 16px 35dvh; pointer-events: none; }
+    .rn-step { pointer-events: auto; max-width: 340px; margin: 0 auto 100vh; margin-bottom: 100dvh; box-sizing: border-box;
+      padding: 14px 16px 4px; background: rgba(7, 7, 8, .74); -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
+      border: 1px solid rgba(192, 180, 142, .32); font-size: 17px; line-height: 1.45; }
+    .rn-step:last-child { margin-bottom: 0; }
+    .rn-step h2 { font-size: 28px; }
+    .rn-n { display: inline; }
+  }
+
+  /* iPad either way up, and computers: below the film, the loop pinned on the left, the notes on the right */
+  @media (min-width: 700px) {
+    .feed { max-width: 1000px; padding: 24px 32px 64px; font-size: 20px; }
+    .filters { position: sticky; top: 0; z-index: 3; padding: 12px 0 10px; box-shadow: 0 1px 0 var(--slate); }
+    .rn-story { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 40px; align-items: start; margin-top: 12px; }
+    .rn-pin { top: 70px; align-items: flex-end; }
+    .rn-hud { width: min(100%, calc((100dvh - 130px) * 393 / 852)); font-size: 13px; }
+    .rn-bars i { width: 32px; height: 5px; }
+    .rn-reel { width: min(100%, calc((100dvh - 130px) * 393 / 852)); }
+    .rn-steps { padding: 0 0 50dvh; }
+    .rn-step { padding: 18px 0 22px; opacity: .3; cursor: pointer; transition: opacity .3s; }
+    .rn-step:first-child { padding-top: 0; }
+    .rn-step + .rn-step { border-top: 1px dashed var(--slate); }
+    .rn-step.on { opacity: 1; cursor: default; }
+    .rn-step.two { margin-bottom: 40dvh; }   /* room for the second stop: BEFORE, then AFTER */
+    .post h1 { font-size: 52px; }
+    .post h2 { font-size: 34px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .more .ar { animation: none; } .rn-reel .loop, .rn-reel .loop.on { transition: none; } }
 </style>
 </head>
 <body>
-  <div id="opener"></div>
+  <div class="filmcol" id="top"><div id="opener"></div></div>
+
+  <!-- the feed: newest post first. A post is <article class="post" id="..." data-tag="...">; its tag must be one of
+       TAGS in the feed script. A release note is an .rn-story (README "The feed") -->
+  <section class="feed" id="feed" aria-label="News and release notes">
+    <nav class="filters" aria-label="Show">
+      <button type="button" class="ftag on" data-tag="all" aria-pressed="true">All</button>
+      <button type="button" class="ftag" data-tag="release-notes" aria-pressed="false">Release notes</button>
+      <button type="button" class="ftag" data-tag="news" aria-pressed="false">News</button>
+    </nav>
+
+    <article class="post" id="alpha-week-1" data-tag="release-notes"><span id="this-week" class="anchor"></span>
+      <div class="meta"><button type="button" class="tag" data-tag="release-notes">Release notes</button><span class="kicker">· November 10 to 17</span></div>
+      <h1>This week in the Alpha</h1>
+      <div class="rn-story">
+        <div class="rn-pin">
+          <div class="rn-hud" aria-hidden="true"><span class="rn-count"><b>1</b> / 5</span><span class="rn-bars"><i class="on"></i><i></i><i></i><i></i><i></i></span></div>
+          <div class="rn-reel">
+            <video class="loop on" data-step="0" data-part="0" muted loop playsinline preload="none" aria-label="A film is tapped twice and the fast-forward readout in the top right goes from 3x to 7x"><source src="blog/alpha-week-1/loop-ff.mp4" type="video/mp4"></video>
+            <video class="loop" data-step="1" data-part="0" muted loop playsinline preload="none" aria-label="The match receipt with a blinking box around the SKIP TO NEXT FIGHT button"><source src="blog/alpha-week-1/loop-skip.mp4" type="video/mp4"></video>
+            <video class="loop" data-step="2" data-part="0" muted loop playsinline preload="none" aria-label="Before: small DECLINE and SIGN buttons, boxed"><source src="blog/alpha-week-1/event-before.mp4" type="video/mp4"></video>
+            <video class="loop" data-step="2" data-part="1" muted loop playsinline preload="none" aria-label="After: DECLINE $0 Nothing changes, and SIGN +$5B No scissors next match, boxed"><source src="blog/alpha-week-1/event-after.mp4" type="video/mp4"></video>
+            <video class="loop" data-step="3" data-part="0" muted loop playsinline preload="none" aria-label="Three swipes from different spots on the screen pick Paper, Rock, then Scissors before SHOOT"><source src="blog/alpha-week-1/loop-swipe.mp4" type="video/mp4"></video>
+            <video class="loop" data-step="4" data-part="0" muted loop playsinline preload="none" aria-label="The HIGH SCORES screen, YOUR RUNS tab: RAFA, 12,741, WORLD number 22, boxed"><source src="blog/alpha-week-1/personal-best.mp4" type="video/mp4"></video>
+          </div>
+        </div>
+        <ol class="rn-steps">
+          <li class="rn-step on" data-step="0" tabindex="0">
+            <div class="kicker"><span class="rn-n">1 / 5 · </span>New</div><h2>Hurry up, please</h2><p>Tap once for 3× fast-forward, twice for 7×. The speed shows top right.</p>
+          </li>
+          <li class="rn-step" data-step="1" tabindex="0">
+            <div class="kicker"><span class="rn-n">2 / 5 · </span>New</div><h2>Skip the Fair</h2><p>SKIP TO NEXT FIGHT takes you straight to the next fight. Skipping the Fair means no shopping and no events, but if you just want to kill kill kill, we aim to please.</p>
+          </li>
+          <li class="rn-step two" data-step="2" tabindex="0">
+            <div class="kicker"><span class="rn-n">3 / 5 · </span>Better</div><h2>Read the fine print (there's less of it)</h2><p>The old buttons hid the deal in tiny text and made you squint. Now they say it big, simple, and beautiful.</p>
+          </li>
+          <li class="rn-step" data-step="3" tabindex="0">
+            <div class="kicker"><span class="rn-n">4 / 5 · </span>Better</div><h2>Swipe Right Anywhere.</h2><p>Same swipe as before, just from anywhere on the screen: up for Paper, left for Rock, right for Scissors.</p>
+          </li>
+          <li class="rn-step" data-step="4" tabindex="0">
+            <div class="kicker"><span class="rn-n">5 / 5 · </span>Challenge</div><h2>Beat your old score</h2><p>This is Rafa's board: one run, 12,741, 22nd in the world. Not very impressive. A new YOUR RUNS screen now shows all your individual runs. Beat your own best score by Tuesday, November 24 and I'll send you 25 cents USA in cold hard cash.</p><p>Screenshot your new best on YOUR RUNS, then text it to me with your mailing address. One per player, by Tuesday, November 24.</p><div class="cap">Pictured: Rafa's real run</div>
+          </li>
+        </ol>
+      </div>
+    </article>
+
+    <article class="post" id="site-live" data-tag="news">
+      <div class="meta"><button type="button" class="tag" data-tag="news">News</button><span class="kicker">· November 8</span></div>
+      <h1>rps.plus is live</h1>
+      <p>This page launched with the opener film. More coming.</p>
+    </article>
+
+    <p class="none" hidden>Nothing tagged that yet.</p>
+    <footer class="end">
+      <div class="kicker">Alpha coming January 2027</div>
+      <a class="cta" href="#top">Tell me more ▸</a>
+    </footer>
+  </section>
   <div class="below"><div class="chip">
   <div class="notify" id="notify">
     <button class="ask" type="button" aria-expanded="false" aria-controls="notify-form">Send me updates ▸</button>
@@ -184,6 +332,90 @@
     window.film = RPSOpener.mount(document.getElementById('opener'),
       { base: 'opener/', autoplay: q.get('autoplay') !== '0', paradeStart: pk == null ? null : +pk });
     document.querySelector('#opener .box').appendChild(document.querySelector('.below'));
+  </script>
+  <script>
+    // ---- the feed (README "The feed") ----
+    // the filter: one tag at a time; the address keeps it (rps.plus/#release-notes). A new tag: add it here, add its
+    // button to .filters, and put it on its posts as data-tag
+    const TAGS = ['release-notes', 'news'];
+    const posts = [...document.querySelectorAll('.post')], ftags = [...document.querySelectorAll('.ftag')], none = document.querySelector('.none');
+    function show(tag, scroll) {
+      if (!TAGS.includes(tag)) tag = 'all';
+      ftags.forEach(c => { const on = c.dataset.tag === tag; c.classList.toggle('on', on); c.setAttribute('aria-pressed', on); });
+      let n = 0; posts.forEach(p => { const hit = tag === 'all' || p.dataset.tag === tag; p.hidden = !hit; n += hit; });
+      none.hidden = n > 0;
+      try { history.replaceState(null, '', tag === 'all' ? location.pathname + location.search : '#' + tag); } catch (e) {}
+      if (scroll) document.getElementById('feed').scrollIntoView({ block: 'start' });
+      requestAnimationFrame(update);
+    }
+    ftags.forEach(c => c.onclick = () => show(c.dataset.tag, false));
+    document.querySelectorAll('.post .tag').forEach(t => t.onclick = () => show(t.dataset.tag, true));
+    // the closing button: back to the film and open the sign-up
+    document.querySelector('.cta').onclick = e => { e.preventDefault(); scrollTo({ top: 0 }); setTimeout(() => document.querySelector('.notify .ask')?.click(), 500); };
+
+    // a release note's story: the last note whose top has passed the lit line is lit and the stage shows its loop. The
+    // line is 65 % down a phone's screen (a card's loop slides in as the card comes up) and 45 % down on iPad and
+    // computers. A note with two loops (BEFORE, AFTER) has a second stop 30 % of a screen further: scroll drives it, so
+    // neither is missed, and scrolling back shows BEFORE again
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wide = matchMedia('(min-width: 700px)');
+    const stories = [...document.querySelectorAll('.rn-story')].map(el => ({ el, stage: el.querySelector('.rn-pin'),
+      steps: [...el.querySelectorAll('.rn-step')], vids: [...el.querySelectorAll('.rn-reel .loop')], reel: el.querySelector('.rn-reel'),
+      count: el.querySelector('.rn-count b'), bars: [...el.querySelectorAll('.rn-bars i')], cur: 0, part: 0, near: false }));
+    const litLine = () => innerHeight * (wide.matches ? 0.45 : 0.65);
+    function play(v) { if (still) { v.controls = true; return; } v.play().catch(() => {}); }
+    // the old loop slides out and the new one in from the side you scrolled toward; the count, bars and edge change with it
+    function light(s, i, part) {
+      if (s.cur === i && s.part === part) return;
+      const fwd = i > s.cur || (i === s.cur && part > s.part); s.cur = i; s.part = part;
+      s.steps.forEach((st, k) => st.classList.toggle('on', k === i));
+      s.bars.forEach((b, k) => { b.classList.toggle('on', k === i); b.classList.toggle('done', k < i); });
+      if (s.count) s.count.textContent = i + 1;
+      const next = s.vids.find(v => +v.dataset.step === i && +v.dataset.part === part);
+      s.vids.forEach(v => { v.classList.remove('gone-left', 'gone-right');
+        if (v.classList.contains('on')) { v.classList.remove('on'); if (!still) v.classList.add(fwd ? 'gone-left' : 'gone-right');
+          setTimeout(() => { if (!v.classList.contains('on')) { v.pause(); v.currentTime = 0; } }, 600); } });
+      if (!still) { next.style.transition = 'none'; next.classList.toggle('from-left', !fwd); void next.offsetWidth; next.style.transition = ''; }
+      next.classList.remove('from-left'); next.classList.add('on');
+      s.reel.classList.add('flash'); setTimeout(() => s.reel.classList.remove('flash'), 60);
+      if (s.near) play(next);
+    }
+    function update() {
+      const line = litLine();
+      for (const s of stories) {
+        if (s.el.offsetParent === null) continue;
+        let i = 0, top = 0;
+        s.steps.forEach((st, k) => { const t = st.getBoundingClientRect().top; if (t <= line) { i = k; top = t; } });
+        const parts = s.vids.filter(v => +v.dataset.step === i).length;
+        light(s, i, parts > 1 && top <= line - innerHeight * 0.3 ? 1 : 0);
+      }
+    }
+    let ticking = false;
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; update(); }); } }, { passive: true });
+    addEventListener('resize', update);
+    // load the loops only when the story comes near; play only while its stage is on screen
+    const io = new IntersectionObserver(es => es.forEach(e => { const s = stories.find(x => x.stage === e.target); s.near = e.isIntersecting;
+      const v = s.vids.find(x => x.classList.contains('on'));
+      if (s.near) { s.vids.forEach(x => { if (x.preload === 'none') x.preload = 'auto'; }); if (v) play(v); } else s.vids.forEach(x => x.pause()); }), { rootMargin: '300px 0px' });
+    stories.forEach(s => io.observe(s.stage));
+    // tap a dimmed note (iPad, computer): scroll it to the lit spot
+    stories.forEach(s => s.steps.forEach(st => st.addEventListener('click', () => {
+      if (!wide.matches || st.classList.contains('on')) return;
+      scrollBy({ top: st.getBoundingClientRect().top - litLine() + 2, behavior: still ? 'auto' : 'smooth' });
+    })));
+    // the film's end: Replay shows, and beside it a box that points down the page (built from outside the player)
+    (function endRow() {
+      const rb = document.querySelector('#opener .replay'); if (!rb) return setTimeout(endRow, 200);
+      const row = document.createElement('div'); row.className = 'endrow'; rb.before(row); row.append(rb);
+      const more = document.createElement('a'); more.className = 'more'; more.href = '#this-week';
+      more.innerHTML = '<svg class="ar" width="10" height="6" viewBox="0 0 5 3" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 0h5v1H0zM1 1h3v1H1zM2 2h1v1H2z"/></svg><span>Scroll for more</span>';
+      row.append(more);
+      more.onclick = e => { e.preventDefault(); document.getElementById('this-week').scrollIntoView({ behavior: still ? 'auto' : 'smooth' }); };
+      const sync = () => { more.style.visibility = rb.style.visibility === 'visible' ? 'visible' : 'hidden'; };
+      new MutationObserver(sync).observe(rb, { attributes: true, attributeFilter: ['style'] }); sync();
+    })();
+    const h = location.hash.slice(1); if (TAGS.includes(h)) show(h, true);
+    update();
   </script>
 </body>
 </html>
