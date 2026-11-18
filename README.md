@@ -24,7 +24,7 @@ to the newest post; each post has its own anchor (`#alpha-week-1`) so an old lin
   put it on its posts.
 - **A release note is a story** (`.rn-story`): one stage holds every loop (`.rn-reel video.loop`, `data-step` =
   the note, `data-part` = 0 or 1), and the notes (`.rn-step`) scroll past it. The lit note's loop shows. Phones
-  (under 700 px): the loop fills the screen and each note is a see-through card that scrolls over it, a screen
+  (under 700 px): the loop fills the screen and each note is a solid rust card that scrolls over it, a screen
   apart; the card's kicker carries `N / 5`. iPad and computers: the loop pinned left with a count and bars, the
   notes right. A note with two loops (BEFORE, AFTER) switches by scroll: the second loop shows 30 % of a screen
   after the note lights (give that note `class="rn-step two"`).

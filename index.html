@@ -30,7 +30,7 @@
     color-scheme: dark;
     /* master-palette tokens (rps-plus assets/palette.json) */
     --ink: #070708; --charcoal: #2B2824; --slate: #48433C; --warm-grey: #817965;
-    --grey: #9E9687; --cream: #F3E5C4; --brass-light: #C0B48E;
+    --grey: #9E9687; --cream: #F3E5C4; --brass-light: #C0B48E; --rust: #8A3B2A; --mars-ink: #B06E5C;
   }
   html, body { margin: 0; }
   body {
@@ -174,7 +174,7 @@
   .cta { display: inline-block; padding: 0 18px; background: var(--cream); color: var(--ink); text-decoration: none; font: 24px/48px "Jersey 25", ui-monospace, monospace; letter-spacing: .04em; }
   .cta:active { background: var(--brass-light); }
 
-  /* phones: the loop fills the whole screen and holds still; each note is a see-through card that scrolls up over it,
+  /* phones: the loop fills the whole screen and holds still; each note is a solid rust card (owner pick, 2026-11-18) that scrolls up over it,
      a screen apart, so between cards the loop shows whole. The card's kicker carries the count */
   @media (max-width: 699px) {
     .rn-story { margin: 0 -16px; }
@@ -183,8 +183,9 @@
     .rn-reel { width: 100%; height: 100%; max-width: none; aspect-ratio: auto; border: 0; }
     .rn-steps { position: relative; z-index: 3; margin-top: -100vh; margin-top: -100dvh; padding: 80vh 20px 40vh; padding: 80dvh 20px 40dvh; pointer-events: none; }
     .rn-step { pointer-events: auto; max-width: 340px; margin: 0 auto 100vh; margin-bottom: 100dvh; box-sizing: border-box;
-      padding: 14px 16px 4px; background: rgba(7, 7, 8, .93);
-      border: 1px solid var(--slate); font-size: 17px; line-height: 1.45; text-shadow: 0 1px 0 #000; }
+      padding: 14px 16px 4px; background: var(--rust); border: 2px solid var(--ink); outline: 1px solid var(--mars-ink); outline-offset: -4px;
+      font-size: 17px; line-height: 1.45; text-shadow: 0 1px 0 #000; }
+    .rn-step .kicker, .rn-step .cap { color: var(--cream); }
     .rn-step:last-child { margin-bottom: 0; }
     .rn-step h2 { font-size: 28px; }
     .rn-n { display: inline; }
