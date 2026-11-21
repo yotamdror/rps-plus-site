@@ -12,15 +12,18 @@ pushes the finished files here. Do not copy game source into this repository.
   (`node scripts/marketing/build-opener.mjs`, then all of `dist/marketing/opener/` except its
   `index.html`; since 2026-11-09 that includes `floats/`, the parade's floats). A change to the film repeats that copy.
 
-## The feed
+## News (`news/`)
 
-Under the film, `index.html` carries a feed of news and release notes, newest first (`#feed`). The first screen
-is still the film alone; ▾ SCROLL FOR MORE appears beside ↻ REPLAY when the film ends. `rps.plus/#this-week` jumps
-to the newest post; each post has its own anchor (`#alpha-week-1`) so an old link keeps working.
+The release-notes feed lives on an unlisted page, `rps.plus/news/` (`news/index.html`), newest post first (`#feed`).
+`index.html` is only the sign-up page and links nowhere to it. `rps.plus/news/#this-week` jumps to the newest post;
+each post has its own anchor (`#alpha-week-1`).
 
+- **Old links forward.** The first script in `index.html`'s `<head>` sends an old link such as `rps.plus/#alpha-week-1`
+  to `/news/#alpha-week-1` before anything draws. It holds a hard-coded list: `#this-week`, `#release-notes`, `#news`,
+  `#all`, `#feed`, `#alpha-week-1`, `#site-live`. Every new post id goes on that list.
 - **Tags and the filter.** Each post is `<article class="post" id="..." data-tag="...">` with a brass tag label
   before its date. The row at the top (ALL, RELEASE NOTES, NEWS) shows one tag at a time and keeps it in the address
-  (`rps.plus/#release-notes`). A new tag: add it to `TAGS` in the feed script, add its button to `.filters`, and
+  (`rps.plus/news/#release-notes`). A new tag: add it to `TAGS` in the feed script, add its button to `.filters`, and
   put it on its posts.
 - **A release note is a story** (`.rn-story`): one stage holds every loop (`.rn-reel video.loop`, `data-step` =
   the note, `data-part` = 0 or 1), and the notes (`.rn-step`) scroll past it. The lit note's loop shows. Phones
@@ -33,5 +36,6 @@ to the newest post; each post has its own anchor (`#alpha-week-1`) so an old lin
   `docs/work/mocks/alpha-week-post/scripts/notes.cjs` (that folder's README has the rebuild).
 - **Fonts.** The feed's body text is Geist Pixel (`fonts/GeistPixel-400.woff2`, copied from `rps-plus`
   `assets/fonts/`); headings are Jersey 25, labels Silkscreen.
-- **Adding a post:** copy an `<article>` to the top of `#feed`, give it a new `id`, a tag and a date, and move the
-  `<span id="this-week" class="anchor">` into it. A text post needs nothing else.
+- **Adding a post:** copy an `<article>` to the top of `#feed` in `news/index.html`, give it a new `id`, a tag and a
+  date, and move the `<span id="this-week" class="anchor"></span>` into it. Then add its id to the forwarding list in
+  `index.html`. A text post needs nothing else.
