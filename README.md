@@ -8,9 +8,12 @@ pushes the finished files here. Do not copy game source into this repository.
 
 - `CNAME` sets the custom domain (`rps.plus`; `www.rps.plus` redirects to it).
 - `.nojekyll` serves files as they are, with no Jekyll build.
-- `opener/` is the opener film, copied as built from `rps-plus`
-  (`node scripts/marketing/build-opener.mjs`, then all of `dist/marketing/opener/` except its
-  `index.html`; since 2026-11-09 that includes `floats/`, the parade's floats). A change to the film repeats that copy.
+- `index.html` is the Alpha sign-up page (look A, "Event TV"): the trailer in `film/` (`rps-plus.mp4`, `poster.jpg`;
+  muted autoplay, plays once, then REPLAY; no autoplay under reduced motion), the sponsor marks and benefit stills in
+  `img/`, the game's fonts in `fonts/`. The form posts email and the optional sponsor (`kuiper`, `adAstra`,
+  `paperCorp`, `solarTie`, `ponzi`) with `source: 'site'` and coarse context to the Alpha Worker's `/api/notify`; a
+  page view pings `/api/visit`.
+- `opener/` is the old opener film, kept in the tree but no longer linked from any page.
 
 ## News (`news/`)
 
