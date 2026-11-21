@@ -8,12 +8,27 @@ pushes the finished files here. Do not copy game source into this repository.
 
 - `CNAME` sets the custom domain (`rps.plus`; `www.rps.plus` redirects to it).
 - `.nojekyll` serves files as they are, with no Jekyll build.
-- `index.html` is the Alpha sign-up page (look A, "Event TV"): the trailer in `film/` (`rps-plus.mp4`, `poster.jpg`;
-  muted autoplay, plays once, then REPLAY; no autoplay under reduced motion), the sponsor marks and benefit stills in
+- `index.html` is the Alpha sign-up page (look A, "Event TV"): the trailer in `film/` (muted autoplay, plays once, then REPLAY; no autoplay under reduced motion; see Trailer A/B below; `rps-plus.mp4` and `poster.jpg` are the old film, no longer linked, to delete a week after the switch), the sponsor marks and benefit stills in
   `img/`, the game's fonts in `fonts/`. The form posts email and the optional sponsor (`kuiper`, `adAstra`,
   `paperCorp`, `solarTie`, `ponzi`) with `source: 'site'` and coarse context to the Alpha Worker's `/api/notify`; a
   page view pings `/api/visit`.
 - `opener/` is the old opener film, kept in the tree but no longer linked from any page.
+
+## Trailer A/B (`film/`)
+
+The page plays one of two films, picked at random per visitor, so sign-up rates can be compared. Files: `film/fair.mp4`
++ `film/fair-poster.jpg` (the fair trailer) and `film/corporate.mp4` + `film/corporate-poster.jpg` (the corporate one).
+The `<video>` has no `src` in the HTML; the script sets `src` and `poster` after the pick.
+
+- **The pick.** A coin flip on a device's first load, kept in `localStorage` key `rpsFilm` (`fair` or `corporate`), so a
+  visitor sees the same film every time. Storage blocked: a fresh flip each load.
+- **What is sent.** `film` goes with the page view (`/api/visit`, plus `first` on a device's first load), with the
+  sign-up (`/api/notify`), and with one-time signals per load (`half`, `end`, `sound`, `replay`). Run-data's "Trailer
+  score" section has the table and query.
+- **`?film=fair` or `?film=corporate`** forces that film for one load: nothing stored, `film` sent as null.
+- **`?me`** sets `localStorage` `rpsMe`; from then on this device sends `film` null, so the owner's visits don't count.
+- **Swapping a film:** replace its two files (same names; the poster is the first frame, a JPG under ~150 KB) and push.
+  Visitors keep their assigned side, so a changed film mixes into the same counts: start a new test under new names.
 
 ## News (`news/`)
 

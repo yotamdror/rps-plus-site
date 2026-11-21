@@ -120,7 +120,7 @@ h1{font-size:46px;color:#fff}
 <main class="wrap">
   <section class="hero">
     <div class="film">
-      <video src="film/rps-plus.mp4" poster="film/poster.jpg" muted autoplay playsinline></video>
+      <video muted autoplay playsinline></video><noscript><video src="film/fair.mp4" poster="film/fair-poster.jpg" controls playsinline></video></noscript>
       <div class="filmbar"><button class="sound" id="play" type="button" hidden>▸ PLAY</button><button class="sound replay" type="button" hidden>↻ REPLAY</button><button class="sound" id="snd" type="button">TAP FOR SOUND ▸</button></div>
     </div>
     <div class="pitch">
@@ -151,22 +151,42 @@ h1{font-size:46px;color:#fff}
 const API = 'https://rps-plus-alpha-staging.rps-plus.workers.dev/api/notify';
 // Coarse context only (site-telemetry): screen size, the referring host and a ?l= tag (e.g. rps.plus/?l=friends-1).
 // Country, region and browser are worked out by the Worker; no cookies, no ids, no IP kept.
+// Trailer A/B (trailer-ab): one of two films per visitor, kept in localStorage `rpsFilm`. ?film=fair|corporate forces one
+// for this load (nothing stored, film sent as null); ?me marks this device as the owner's (rpsMe), so its posts carry
+// film null. Every storage access is guarded: blocked storage means a fresh flip each load and first=false.
+const FILMS = ['fair', 'corporate'];
+const qs = new URLSearchParams(location.search);
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, x) { try { localStorage.setItem(k, x); return true; } catch { return false; } } };
+if (qs.has('me')) store.set('rpsMe', '1');
+let film = '', first = false, forced = qs.get('film');
+if (FILMS.includes(forced)) film = forced;
+else {
+  film = store.get('rpsFilm');
+  if (!FILMS.includes(film)) { film = FILMS[Math.random() < 0.5 ? 0 : 1]; first = store.set('rpsFilm', film); }
+}
+const sendFilm = (FILMS.includes(forced) || qs.has('me') || store.get('rpsMe') === '1') ? null : film;
+// Coarse context only (site-telemetry): screen size, the referring host and a ?l= tag (e.g. rps.plus/?l=friends-1).
+// Country, region and browser are worked out by the Worker; no cookies, no ids, no IP kept.
 const ctx = (() => {
-  const link = (new URLSearchParams(location.search).get('l') || '').toLowerCase();
+  const link = (qs.get('l') || '').toLowerCase();
   let referrer = ''; try { referrer = document.referrer ? new URL(document.referrer).hostname : ''; } catch {}
   if (referrer === location.hostname) referrer = '';
-  return { screen: `${screen.width}x${screen.height}`, referrer, link: /^[a-z0-9-]{1,32}$/.test(link) ? link : '' };
+  return { screen: `${screen.width}x${screen.height}`, referrer, link: /^[a-z0-9-]{1,32}$/.test(link) ? link : '', film: sendFilm };
 })();
-try { // one page view; a failure is silent and never touches the page
-  fetch(API.replace(/notify$/, 'visit'), { method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' }, body: JSON.stringify(ctx) }).catch(() => {});
-} catch {}
+const visit = extra => { try { // a failure is silent and never touches the page
+  fetch(API.replace(/notify$/, 'visit'), { method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...ctx, ...extra }) }).catch(() => {});
+} catch {} };
+visit({ first });
+const sent = {}, signal = n => { if (!sent[n]) { sent[n] = 1; visit({ signal: n }); } };
 const v=document.querySelector('video'),s=document.getElementById('snd'),rp=document.querySelector('.replay'),pl=document.getElementById('play');
+v.poster='film/'+film+'-poster.jpg';v.src='film/'+film+'.mp4';
 const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
 if(still){v.removeAttribute('autoplay');v.pause();pl.hidden=false;}
-v.addEventListener('ended',()=>{rp.hidden=false;});
+v.addEventListener('ended',()=>{rp.hidden=false;signal('end');});
+v.addEventListener('timeupdate',()=>{if(v.duration&&v.currentTime/v.duration>=0.5)signal('half');});
 pl.onclick=()=>{pl.hidden=true;v.play();};
-rp.onclick=()=>{rp.hidden=true;v.currentTime=0;v.play();};
-s.onclick=()=>{v.muted=!v.muted;if(!v.muted){v.currentTime=0;rp.hidden=true;pl.hidden=true;v.play()}s.textContent=v.muted?'TAP FOR SOUND \u25B8':'SOUND ON';};
+rp.onclick=()=>{signal('replay');rp.hidden=true;v.currentTime=0;v.play();};
+s.onclick=()=>{signal('sound');v.muted=!v.muted;if(!v.muted){v.currentTime=0;rp.hidden=true;pl.hidden=true;v.play()}s.textContent=v.muted?'TAP FOR SOUND \u25B8':'SOUND ON';};
 let pick='';
 const hs=[...document.querySelectorAll('.h')];
 hs.forEach(b=>b.onclick=()=>{hs.forEach(x=>x.setAttribute('aria-checked','false'));b.setAttribute('aria-checked','true');pick=b.dataset.id;});
