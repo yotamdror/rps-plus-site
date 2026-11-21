@@ -63,6 +63,7 @@ h3{font-family:Jersey;font-weight:400;line-height:1;margin:0 0 6px}
 .go{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;cursor:pointer;text-decoration:none;font-family:Jersey;font-size:26px;letter-spacing:.03em}
 .done{display:none;margin-top:12px;font-family:Silk;font-size:11px;letter-spacing:.2em;text-align:center}
 .order.sent .done{display:block}
+.free{margin-top:10px;font-size:13px;text-align:center;color:var(--grey)}
 .gets{margin-top:44px}
 .gets h2{font-size:34px;margin-bottom:18px}
 .get{display:grid;grid-template-columns:118px 1fr;gap:14px;align-items:start;margin-bottom:22px}
@@ -125,7 +126,7 @@ h1{font-size:46px;color:#fff}
     </div>
     <div class="pitch">
       <p class="kicker">Public Alpha · January 2027</p>
-      <h1>Cohort Zero is now forming</h1>
+      <h1>The Seed Round is open</h1>
       <p class="lede">Rock, Paper, Scissors Plus goes public at the end of 2027 at a projected valuation of <b class="money">$2 trillion</b>. Before the bell, a limited number of players will be able to shape it.</p>
       <form class="order" id="order" novalidate>
         <label class="lbl" for="em">Your email</label>
@@ -133,12 +134,13 @@ h1{font-size:46px;color:#fff}
         <p class="lbl">Pick the corporation you want a piece of</p>
         <div class="holdings" role="radiogroup" aria-label="Choose your holding"><button type="button" class="h" data-id="kuiper" role="radio" aria-checked="false"><img src="img/mark-kuiper.png" alt=""><span><span class="nm">Kuiper Mutual</span><span class="mt">We have priced your fear. The premium is very reasonable.</span></span></button><button type="button" class="h" data-id="adAstra" role="radio" aria-checked="false"><img src="img/mark-adastra.png" alt=""><span><span class="nm">Ad Astra Media</span><span class="mt">Your attention is our product. Thank you for your attention.</span></span></button><button type="button" class="h" data-id="paperCorp" role="radio" aria-checked="false"><img src="img/mark-papercorp.png" alt=""><span><span class="nm">Interplanetary Paper Corp</span><span class="mt">Excellent service. Clause 14(b) applies.</span></span></button><button type="button" class="h" data-id="solarTie" role="radio" aria-checked="false"><img src="img/mark-solartie.png" alt=""><span><span class="nm">Solar Tie Association</span><span class="mt">Old money. Older ties.</span></span></button><button type="button" class="h" data-id="ponzi" role="radio" aria-checked="false"><img src="img/mark-ponzi.png" alt=""><span><span class="nm">Ponzi's Pyramid</span><span class="mt">Returns guaranteed by the next investor.</span></span></button></div>
         <button class="go" type="submit">Reserve my shares ▸</button>
+        <p class="free">Free to join. No money changes hands, except the $2 we pay you.</p>
         <p class="done" id="st" role="status" aria-live="polite"></p>
       </form>
     </div>
   </section>
   <section class="gets">
-    <h2>What Cohort Zero receives</h2>
+    <h2>What seed investors receive</h2>
     <div class="list"><article class="get"><figure><img src="img/still-fame.png" alt=""></figure><div><h3>First on the board</h3><p>Your name goes on the world high scores before the public gets a turn. Everyone after you will see it.</p></div></article><article class="get"><figure><img src="img/still-shareholder.png" alt=""></figure><div><h3>Shape the game</h3><p>The game is simple. The loop, the difficulty, the costs and the scores still need testing, so we can optimize addiction before we go public. We would pay children to playtest it, but legally we cannot. So we are begging you.</p></div></article><article class="get"><figure><img src="img/still-cheque.png" alt=""></figure><div><h3>Up to <b class="money">$2.00</b> in real money</h3><p>Paid in quarterly installments of 25¢, for feedback we actually use.</p></div></article><article class="get"><figure><img src="img/still-agreement.png" alt=""></figure><div><h3>A founding stake</h3><p>A fractional founding interest in the corporation you pick, with voting privileges, residuals and a standing invitation to the annual shareholders’ meeting.</p></div></article></div>
   </section>
   <section class="close">
@@ -183,7 +185,7 @@ form.addEventListener('submit',async e=>{
     const res=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,...(pick?{sponsor:pick}:{}),source:'site',...ctx}),signal:AbortSignal.timeout(10000)});
     if(res.status===400){say("That email doesn't look right.",true);em.focus();go.disabled=false;return;}
     if(!res.ok)throw new Error(res.status);
-    say('Allocation confirmed \u00B7 welcome to Cohort Zero');
+    say('Allocation confirmed \u00B7 welcome to the Seed Round');
   }catch{
     say("Couldn't send. Check your connection and tap again.",true);go.disabled=false;
   }
