@@ -22,11 +22,9 @@ The `<video>` has no `src` in the HTML; the script sets `src` and `poster` after
 
 - **The pick.** A coin flip on a device's first load, kept in `localStorage` key `rpsFilm` (`fair` or `corporate`), so a
   visitor sees the same film every time. Storage blocked: a fresh flip each load.
-- **What is sent.** `film` goes with the page view (`/api/visit`, plus `first` on a device's first load), with the
-  sign-up (`/api/notify`), and with one-time signals per load (`half`, `end`, `sound`, `replay`). Run-data's "Trailer
-  score" section has the table and query.
-- **`?film=fair` or `?film=corporate`** forces that film for one load: nothing stored, `film` sent as null.
-- **`?me`** sets `localStorage` `rpsMe`; from then on this device sends `film` null, so the owner's visits don't count.
+- **What is sent.** `film` goes with the page view (`/api/visit`, plus `first` on a device's first load) and with the
+  sign-up (`/api/notify`). Nothing rides in the URL (owner, 2026-11-22). Run-data's "Trailer score" section in
+  `rps-plus` has the query.
 - **Swapping a film:** replace its two files (same names; the poster is the first frame, a JPG under ~150 KB) and push.
   Visitors keep their assigned side, so a changed film mixes into the same counts: start a new test under new names.
 
