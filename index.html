@@ -15,14 +15,14 @@ if (['#this-week','#release-notes','#news','#all','#feed','#alpha-week-1','#site
 <meta property="og:title" content="RPS Plus">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://rps.plus/">
-<meta property="og:description" content="Rock, Paper, Scissors Plus goes public at the end of 2027. Join the Alpha early and own a piece of it.">
+<meta property="og:description" content="Rock Paper Scissors Plus anticipates going public in 2027. Join the Alpha early and own a piece of it.">
 <meta property="og:image" content="https://rps.plus/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="ROCK PAPER SCISSORS PLUS in pixel letters on black">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://rps.plus/og.png">
-<meta name="description" content="Rock, Paper, Scissors Plus goes public at the end of 2027. Join the Alpha early and own a piece of it.">
+<meta name="description" content="Rock Paper Scissors Plus anticipates going public in 2027. Join the Alpha early and own a piece of it.">
 <meta name="theme-color" content="#070708">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%23070708'/%3E%3Crect x='1' y='5' width='4' height='6' fill='%23FF2E6E'/%3E%3Crect x='6' y='5' width='4' height='6' fill='%232EE6FF'/%3E%3Crect x='11' y='5' width='4' height='6' fill='%23FFCE3A'/%3E%3C/svg%3E">
 <link rel="preload" href="fonts/Jersey25-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -48,9 +48,10 @@ img{image-rendering:pixelated;display:block;max-width:100%}
 h1{font-family:Jersey;font-weight:400;line-height:.95;margin:6px 0 12px}
 h2{font-family:Jersey;font-weight:400;line-height:1}
 h3{font-family:Jersey;font-weight:400;line-height:1;margin:0 0 6px}
-.pitch{padding:22px 0 0}
+.pitch{margin-top:16px;padding:18px 16px}
 .lede{max-width:34em}
-.order{margin-top:22px;padding:16px}
+.fine{margin-top:8px;font-size:12px;line-height:1.45;max-width:40em}
+.order{margin-top:18px;padding-top:16px}
 .order input{width:100%;font:inherit;font-size:17px;padding:14px 12px;margin:8px 0 16px;border-radius:0;outline:none}
 .holdings{display:grid;grid-template-columns:1fr;gap:6px;margin:8px 0 18px}
 .h{display:grid;grid-template-columns:32px 1fr;align-items:center;column-gap:12px;min-height:58px;padding:9px 12px;cursor:pointer;background:none;text-align:left;font:inherit}
@@ -74,10 +75,19 @@ h3{font-family:Jersey;font-weight:400;line-height:1;margin:0 0 6px}
 .close .big{font-family:Jersey;font-size:34px;line-height:1;margin-bottom:18px}
 footer{margin-top:36px;text-align:center;font-family:Silk;font-size:9px;letter-spacing:.3em}
 @media (min-width:900px){
-  .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start;padding-top:20px}
-  .film{position:sticky;top:20px}
-  .pitch{padding-top:0}
-  h1{font-size:64px}
+  /* Two equal boxes side by side: the grid stretches both to the taller one; the square film and its buttons sit centred in theirs. */
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:stretch;padding-top:20px}
+  .film{display:flex;flex-direction:column;justify-content:center;padding:20px 22px}
+  .pitch{margin-top:0;padding:20px 22px}
+  h1{font-size:54px;margin-bottom:10px}
+  .lede{font-size:14px;line-height:1.5}
+  .fine{font-size:11px}
+  .order{margin-top:14px;padding-top:12px}
+  .order input{padding:11px 12px;margin:6px 0 12px}
+  .holdings{gap:5px;margin:6px 0 14px}
+  .h{min-height:48px;padding:6px 12px}
+  .h img{width:28px;height:28px}
+  .go{min-height:52px}
   .gets{margin-top:72px}
   .gets .list{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
   .get{grid-template-columns:1fr;gap:12px}
@@ -92,7 +102,9 @@ body{background:var(--ink);color:var(--cream)}
 .sound{background:var(--cream);color:var(--ink)}
 h1{font-size:46px;color:#fff}
 .money{color:var(--gold);font-weight:400}
-.order{border:1px solid var(--slate);background:#0b0b0c}
+.pitch{border:1px solid var(--slate);background:#0d0d0f}
+.fine{color:var(--warm-grey)}
+.order{border-top:1px solid var(--charcoal)}
 .order input{background:var(--ink);color:var(--cream);border:1px solid var(--slate)}
 .order input:focus{border-color:var(--brass)}
 .h{border:1px solid var(--slate);color:var(--grey)}
@@ -115,7 +127,7 @@ h1{font-size:46px;color:#fff}
 </style>
 </head>
 <body>
-<header class="mast"><div class="brand">RPS+</div><div class="tag">OFFERING 00</div></header>
+<header class="mast"><div class="brand">RPS plus</div></header>
 
 <main class="wrap">
   <section class="hero">
@@ -126,26 +138,27 @@ h1{font-size:46px;color:#fff}
     <div class="pitch">
       <p class="kicker">Public Alpha · January 2027</p>
       <h1>The Seed Round is open</h1>
-      <p class="lede">Rock, Paper, Scissors Plus goes public at the end of 2027 at a projected valuation of <b class="money">$2 trillion</b>. Before the bell, a limited number of players will be able to shape it. The buy-in is <b class="money">$0</b>. If anything, we pay you.</p>
+      <p class="lede">Rock Paper Scissors Plus anticipates going public in 2027 as the easiest and most addictive game of all time, with a goal of a <b class="money">$2 trillion</b> valuation. Before the bell, a limited number of players will be able to shape it. The buy-in is <b class="money">$0</b>. For our earliest investors, we pay you for your expertise and guidance.*</p>
+      <p class="fine">* We need human bodies to train our engagement engine.</p>
       <form class="order" id="order" novalidate>
         <label class="lbl" for="em">Your email</label>
         <input id="em" type="email" placeholder="you@email" autocomplete="email">
-        <p class="lbl">Pick the corporation you want a piece of</p>
+        <p class="lbl">Pick your corporation</p>
         <div class="holdings" role="radiogroup" aria-label="Choose your holding"><button type="button" class="h" data-id="kuiper" role="radio" aria-checked="false"><img src="img/mark-kuiper.png" alt=""><span><span class="nm">Kuiper Mutual</span><span class="mt">We have priced your fear. The premium is very reasonable.</span></span></button><button type="button" class="h" data-id="adAstra" role="radio" aria-checked="false"><img src="img/mark-adastra.png" alt=""><span><span class="nm">Ad Astra Media</span><span class="mt">Your attention is our product. Thank you for your attention.</span></span></button><button type="button" class="h" data-id="paperCorp" role="radio" aria-checked="false"><img src="img/mark-papercorp.png" alt=""><span><span class="nm">Interplanetary Paper Corp</span><span class="mt">Excellent service. Clause 14(b) applies.</span></span></button><button type="button" class="h" data-id="solarTie" role="radio" aria-checked="false"><img src="img/mark-solartie.png" alt=""><span><span class="nm">Solar Tie Association</span><span class="mt">Old money. Older ties.</span></span></button><button type="button" class="h" data-id="ponzi" role="radio" aria-checked="false"><img src="img/mark-ponzi.png" alt=""><span><span class="nm">Ponzi's Pyramid</span><span class="mt">Returns guaranteed by the next investor.</span></span></button></div>
-        <button class="go" type="submit">Reserve my shares ▸</button>
+        <button class="go" type="submit">Join the frontier ▸</button>
         <p class="done" id="st" role="status" aria-live="polite"></p>
       </form>
     </div>
   </section>
   <section class="gets">
     <h2>What seed investors receive</h2>
-    <div class="list"><article class="get"><figure><img src="img/still-fame.png" alt=""></figure><div><h3>First on the board</h3><p>Your name goes on the world high scores before the public gets a turn. Everyone after you will see it.</p></div></article><article class="get"><figure><img src="img/still-shareholder.png" alt=""></figure><div><h3>Shape the game</h3><p>The game is simple. The loop, the difficulty, the costs and the scores still need testing, so we can optimize addiction before we go public. We would pay children to playtest it, but legally we cannot. So we are begging you.</p></div></article><article class="get"><figure><img src="img/still-cheque.png" alt=""></figure><div><h3>Up to <b class="money">$2.00</b> in real money</h3><p>Paid in quarterly installments of 25¢, for feedback we actually use.</p></div></article><article class="get"><figure><img src="img/still-agreement.png" alt=""></figure><div><h3>A founding stake</h3><p>A fractional founding interest in the corporation you pick, with voting privileges, residuals and a standing invitation to the annual shareholders’ meeting.</p></div></article></div>
+    <div class="list"><article class="get"><figure><img src="img/still-fame.png" alt=""></figure><div><h3>First on the board</h3><p>Your name goes on the world high scores before the public gets a turn. Everyone after you will see it and be jealous.</p></div></article><article class="get"><figure><img src="img/still-shareholder.png" alt=""></figure><div><h3>Shape the game</h3><p>The loop, the difficulty and the scores still need testing, so we can optimize addiction before we go public. We would pay children to do it, but legally we cannot. So we are begging you.</p></div></article><article class="get"><figure><img src="img/still-cheque.png" alt=""></figure><div><h3>Up to <b class="money">$2.00</b> in real money</h3><p>Paid in quarterly installments of 25¢, for feedback we might use and provide zero credit for. Either way, we will pay you above market rate for your usage data.</p></div></article><article class="get"><figure><img src="img/still-agreement.png" alt=""></figure><div><h3>A founding stake</h3><p>A fractional stake in the corporation you pick, with voting rights, dividends and a seat at the annual shareholders’ meeting.</p></div></article></div>
   </section>
   <section class="close">
-    <p class="big">Founding shares are limited. Get in before the bell.</p>
-    <a class="go" id="again" href="#order">Reserve my shares ▸</a>
+    <p class="big">Founding shares are limited.</p>
+    <a class="go" id="again" href="#order">Join the frontier ▸</a>
   </section>
-  <footer>RPS+ · rps.plus · © 2026</footer>
+  <footer>RPS plus · rps.plus · © 2026</footer>
 </main>
 <script>
 const API = 'https://rps-plus-alpha-staging.rps-plus.workers.dev/api/notify';
@@ -183,7 +196,7 @@ form.addEventListener('submit',async e=>{
     const res=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,...(pick?{sponsor:pick}:{}),source:'site',...ctx}),signal:AbortSignal.timeout(10000)});
     if(res.status===400){say("That email doesn't look right.",true);em.focus();go.disabled=false;return;}
     if(!res.ok)throw new Error(res.status);
-    say('Allocation confirmed \u00B7 welcome to the Seed Round');
+    say(pick?'Allocation confirmed. Further instructions coming soon.':'Interest in being a guinea pig confirmed. Further instructions coming soon.');
   }catch{
     say("Couldn't send. Check your connection and tap again.",true);go.disabled=false;
   }
