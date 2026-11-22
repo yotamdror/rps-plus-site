@@ -162,13 +162,14 @@ h1{font-size:46px;color:#fff}
 const API = 'https://rps-plus-alpha-staging.rps-plus.workers.dev/api/notify';
 // Coarse context only (site-telemetry): screen size, the referring host and a ?l= tag (e.g. rps.plus/?l=friends-1).
 // Country, region and browser are worked out by the Worker; no cookies, no ids, no IP kept.
-// Trailer A/B (trailer-ab): one of two films per visitor, kept in localStorage `rpsFilm`; the page view and the sign-up
-// carry it. Nothing rides in the URL. Storage blocked: a fresh flip each load and first=false.
-const FILMS = ['fair', 'corporate'];
+// The film (trailer-ab): one of FILMS per visitor, kept in localStorage `rpsFilm`; the page view and the sign-up carry
+// it. Nothing rides in the URL. Only the gameplay trailer for now (owner, 2026-11-22: "leave corporate off"); add
+// 'corporate' back to FILMS to split visitors between the two again. first: the device's first load.
+const FILMS = ['fair'];
 const qs = new URLSearchParams(location.search);
 let film = null, first = false;
-try { film = localStorage.getItem('rpsFilm'); } catch {}
-if (!FILMS.includes(film)) { film = FILMS[Math.random() < 0.5 ? 0 : 1]; try { localStorage.setItem('rpsFilm', film); first = true; } catch {} }
+try { film = localStorage.getItem('rpsFilm'); first = film === null; } catch {}
+if (!FILMS.includes(film)) { film = FILMS[Math.floor(Math.random() * FILMS.length)]; try { localStorage.setItem('rpsFilm', film); } catch { first = false; } }
 // Coarse context only (site-telemetry): screen size, the referring host and a ?l= tag (e.g. rps.plus/?l=friends-1).
 // Country, region and browser are worked out by the Worker; no cookies, no ids, no IP kept.
 const ctx = (() => {
