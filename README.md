@@ -16,7 +16,9 @@ pushes the finished files here. Do not copy game source into this repository.
 
 ## Trailer A/B (`film/`)
 
-The page plays one of two films, picked at random per visitor, so sign-up rates can be compared. Files: `film/fair.mp4`
+**Now only the gameplay trailer (`fair`)** (owner, 2026-11-22: "leave corporate off for now"): `FILMS` in `index.html` lists `['fair']`; add `'corporate'` back to split visitors between the two films again. The rest of this section describes the split.
+
+The page can play one of two films, picked at random per visitor, so sign-up rates can be compared. Files: `film/fair.mp4`
 + `film/fair-poster.jpg` (the fair trailer) and `film/corporate.mp4` + `film/corporate-poster.jpg` (the corporate one).
 The `<video>` has no `src` in the HTML; the script sets `src` and `poster` after the pick.
 
