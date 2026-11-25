@@ -2,6 +2,8 @@
 
 The public site at <https://rps.plus>, served by GitHub Pages from `main` (root).
 
+The game's name in words is **RPS plus**, never "RPS+" (owner, 2026-11-24); the logo art stays as drawn.
+
 This repository holds only the built, public page. The game's source and the
 marketing page's source live in the private `rps-plus` repository; its build
 pushes the finished files here. Do not copy game source into this repository.
